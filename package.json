@@ -1,0 +1,15 @@
+{
+  "name": "stock-panic-tracker",
+  "version": "1.0.0",
+  "description": "美股恐慌指数实时监控仪表盘",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

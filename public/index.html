@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>美股恐慌指数仪表盘</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="vendor/lightweight-charts.js"></script>
+</head>
+<body>
+
+<!-- ── Header ─────────────────────────────────────────────── -->
+<header class="site-header">
+  <div class="header-left">
+    <span class="logo">📉</span>
+    <div>
+      <h1>美股恐慌指数仪表盘</h1>
+      <p class="header-sub">实时市场情绪监控 · 涵盖纳指 / 标普500 / Mag7 / 科技股</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="market-status" id="marketStatus">
+      <span class="status-dot"></span>
+      <span id="statusText">连接中…</span>
+    </div>
+    <div class="clock" id="clock"></div>
+    <div class="refresh-info">
+      <span id="lastUpdate">--</span>
+    </div>
+  </div>
+</header>
+
+<!-- ── Main content ───────────────────────────────────────── -->
+<main>
+
+  <!-- Panic gauge + VIX row -->
+  <section class="panic-section">
+    <div class="gauge-card">
+      <div class="card-title">恐慌指数</div>
+      <div class="gauge-wrap">
+        <canvas id="gaugeCanvas" width="340" height="190"></canvas>
+        <div class="gauge-center">
+          <div class="panic-score" id="panicScore">--</div>
+          <div class="panic-label" id="panicLabel">载入中</div>
+        </div>
+      </div>
+      <p class="panic-desc" id="panicDesc">正在获取市场数据…</p>
+      <div class="panic-factors" id="panicFactors"></div>
+    </div>
+
+    <div class="side-stats">
+      <!-- VIX card -->
+      <div class="stat-card" id="vixCard">
+        <div class="stat-label">VIX 恐慌指数</div>
+        <div class="stat-val" id="vixPrice">--</div>
+        <div class="stat-chg" id="vixChange">--</div>
+        <div class="stat-hint">15以下平静 · 30以上恐慌 · 40以上极恐</div>
+      </div>
+      <!-- NASDAQ card -->
+      <div class="stat-card clickable" data-sym="^IXIC">
+        <div class="stat-label">NASDAQ 综合</div>
+        <div class="stat-val" id="nasdaqPrice">--</div>
+        <div class="stat-chg" id="nasdaqChange">--</div>
+        <div class="stat-hint" id="nasdaqHint">--</div>
+      </div>
+      <!-- S&P500 card -->
+      <div class="stat-card clickable" data-sym="^GSPC">
+        <div class="stat-label">S&P 500</div>
+        <div class="stat-val" id="sp500Price">--</div>
+        <div class="stat-chg" id="sp500Change">--</div>
+        <div class="stat-hint" id="sp500Hint">--</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Market structure section -->
+  <section class="stock-section">
+    <h2 class="section-title"><span class="section-icon">🧭</span> 市场结构与情绪 <span class="section-sub">计算衍生指标</span></h2>
+    <div class="structure-grid">
+      <div class="struct-card">
+        <div class="struct-label">市场宽度 · 上涨家数</div>
+        <div class="struct-main" id="breadthMain">--</div>
+        <div class="breadth-bar"><div class="breadth-up" id="breadthUpBar"></div><div class="breadth-down" id="breadthDownBar"></div></div>
+        <div class="struct-hint" id="breadthHint">普跌(齐跌)=系统性恐慌</div>
+      </div>
+      <div class="struct-card">
+        <div class="struct-label">52周 新高 / 新低</div>
+        <div class="struct-main"><span class="positive" id="newHigh">--</span><span class="muted"> / </span><span class="negative" id="newLow">--</span></div>
+        <div class="struct-hint">创新低家数飙升 = 恐慌扩散</div>
+      </div>
+      <div class="struct-card">
+        <div class="struct-label">平均相关性 · 抱团度</div>
+        <div class="struct-main" id="avgCorr">--</div>
+        <div class="struct-hint" id="corrHint">趋近1 = 齐涨齐跌(系统性风险)</div>
+      </div>
+      <div class="struct-card">
+        <div class="struct-label">实际波动 HV vs 预期 VIX</div>
+        <div class="struct-main"><span id="marketHV">--</span><span class="muted"> vs </span><span id="marketVix">--</span></div>
+        <div class="struct-hint" id="hvHint">VIX 高于 HV = 市场预期更恐慌</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ETF section -->
+  <section class="stock-section">
+    <h2 class="section-title">
+      <span class="section-icon">⚡</span> 杠杆 ETF
+      <span class="section-sub">QQQ · TQQQ · SQQQ</span>
+    </h2>
+    <div class="stock-grid etf-grid" id="etfGrid"></div>
+  </section>
+
+  <!-- Mag7 section -->
+  <section class="stock-section">
+    <h2 class="section-title">
+      <span class="section-icon">🏆</span> 科技七姐妹 (Mag 7)
+    </h2>
+    <div class="stock-grid mag7-grid" id="mag7Grid"></div>
+  </section>
+
+  <!-- Tech stocks section -->
+  <section class="stock-section">
+    <h2 class="section-title">
+      <span class="section-icon">🔬</span> 半导体 / 科技股
+    </h2>
+    <div class="stock-grid tech-grid" id="techGrid"></div>
+  </section>
+
+  <!-- Risk matrix section -->
+  <section class="stock-section">
+    <h2 class="section-title"><span class="section-icon">📊</span> 风险指标矩阵 <span class="section-sub">点击行查看图表 · 点列头排序</span></h2>
+    <div class="risk-table-wrap">
+      <table class="risk-table" id="riskTable">
+        <thead>
+          <tr>
+            <th data-sort="symbol">代码</th>
+            <th data-sort="price">现价</th>
+            <th data-sort="pct">涨跌%</th>
+            <th data-sort="hv20" title="20日年化历史波动率">HV20</th>
+            <th data-sort="beta" title="对标普500的贝塔系数,>1放大市场波动">Beta</th>
+            <th data-sort="curDD" title="距52周高点回撤">当前回撤</th>
+            <th data-sort="maxDD" title="一年内最大回撤">最大回撤</th>
+            <th data-sort="var95" title="95%置信度下单日在险价值">VaR95</th>
+            <th data-sort="priceVs200" title="价格相对200日均线偏离">距MA200</th>
+            <th data-sort="atrPct" title="ATR占现价百分比">ATR%</th>
+            <th data-sort="streak" title="连续涨跌天数">连涨跌</th>
+            <th>趋势信号</th>
+          </tr>
+        </thead>
+        <tbody id="riskTableBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Leverage decay section -->
+  <section class="stock-section">
+    <h2 class="section-title"><span class="section-icon">⚠️</span> 杠杆ETF衰减分析 <span class="section-sub">近一年 · 实际 vs 理论倍数</span></h2>
+    <div class="leverage-grid" id="leverageGrid"></div>
+    <p class="lev-note">说明：杠杆ETF每日复利+再平衡，单边上涨时可能跑赢理论倍数（正向复利），震荡市则产生<strong>波动损耗(衰减)</strong>。长期持有需警惕。</p>
+  </section>
+
+  <!-- Chart section -->
+  <section class="chart-section">
+    <div class="chart-header">
+      <div class="chart-title-wrap">
+        <span class="chart-symbol" id="chartSymbol">AAPL</span>
+        <span class="chart-name" id="chartName">Apple Inc.</span>
+        <span class="chart-rsi" id="chartRsi"></span>
+      </div>
+      <div class="period-buttons">
+        <button class="period-btn" data-period="1d">1日</button>
+        <button class="period-btn" data-period="1w">1周</button>
+        <button class="period-btn" data-period="1mo">1月</button>
+        <button class="period-btn" data-period="6mo">6月</button>
+        <button class="period-btn active" data-period="1y">1年</button>
+        <button class="period-btn" data-period="5y">5年</button>
+        <button class="period-btn" data-period="20y">20年</button>
+      </div>
+    </div>
+    <div id="chartContainer" class="chart-container">
+      <div class="chart-loading" id="chartLoading">
+        <div class="spinner"></div>
+        <span>载入图表中…</span>
+      </div>
+    </div>
+    <div class="rsi-label-row">
+      <span>RSI (14)</span>
+      <div id="rsiContainer" class="rsi-container"></div>
+    </div>
+    <div class="chart-stats" id="chartStats"></div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <p>数据来源: Yahoo Finance · 延迟约15秒 · 仅供参考，不构成投资建议</p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
