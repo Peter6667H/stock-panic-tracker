@@ -191,7 +191,7 @@ function drawGauge(canvas, score) {
   // Background track
   ctx.beginPath();
   ctx.arc(cx, cy, midR, Math.PI, 0, false);
-  ctx.strokeStyle = '#1e293b';
+  ctx.strokeStyle = '#ece9e0';
   ctx.lineWidth = trackW + 2;
   ctx.lineCap = 'butt';
   ctx.stroke();
@@ -239,16 +239,16 @@ function drawGauge(canvas, score) {
   ctx.lineTo(14, -baseW / 2);
   ctx.lineTo(14,  baseW / 2);
   ctx.closePath();
-  ctx.fillStyle = '#ffffff';
-  ctx.shadowColor = '#ffffff88';
-  ctx.shadowBlur = 8;
+  ctx.fillStyle = '#21201c';
+  ctx.shadowColor = 'rgba(0,0,0,0.2)';
+  ctx.shadowBlur = 6;
   ctx.fill();
   ctx.restore();
 
   // Center cap
   ctx.beginPath();
   ctx.arc(cx, cy, trackW * 0.38, 0, 2 * Math.PI);
-  ctx.fillStyle = '#0d1117';
+  ctx.fillStyle = '#21201c';
   ctx.shadowBlur = 0;
   ctx.fill();
   ctx.beginPath();
@@ -267,10 +267,10 @@ function drawGauge(canvas, score) {
     ctx.beginPath();
     ctx.moveTo(cx + r1 * Math.cos(ang), cy + r1 * Math.sin(ang));
     ctx.lineTo(cx + r2 * Math.cos(ang), cy + r2 * Math.sin(ang));
-    ctx.strokeStyle = '#4b5563';
+    ctx.strokeStyle = '#d6d0c2';
     ctx.lineWidth = 1.5;
     ctx.stroke();
-    ctx.fillStyle = '#6b7280';
+    ctx.fillStyle = '#8a8478';
     ctx.fillText(lbl, cx + rL * Math.cos(ang), cy + rL * Math.sin(ang));
   });
 
@@ -278,8 +278,8 @@ function drawGauge(canvas, score) {
   const zoneLbls = [
     [0.1, '乐观'], [0.3, '中性'], [0.5, '担忧'], [0.7, '恐慌'], [0.9, '极恐'],
   ];
-  ctx.font = `${Math.round(trackW * 0.42)}px system-ui`;
-  ctx.fillStyle = '#ffffffcc';
+  ctx.font = `600 ${Math.round(trackW * 0.42)}px system-ui`;
+  ctx.fillStyle = '#57534a';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   for (const [r, txt] of zoneLbls) {
@@ -295,32 +295,32 @@ function initCharts() {
   // Main candlestick + volume chart
   const mainEl = document.getElementById('chartContainer');
   mainChart = LightweightCharts.createChart(mainEl, {
-    layout:  { background: { color: '#0d1117' }, textColor: '#8b949e' },
-    grid:    { vertLines: { color: '#21262d' }, horzLines: { color: '#21262d' } },
+    layout:  { background: { color: '#fbfaf6' }, textColor: '#8a8478' },
+    grid:    { vertLines: { color: '#efece4' }, horzLines: { color: '#efece4' } },
     crosshair: {
       mode: LightweightCharts.CrosshairMode.Normal,
-      vertLine: { color: '#58a6ff88', labelBackgroundColor: '#1f6feb' },
-      horzLine: { color: '#58a6ff88', labelBackgroundColor: '#1f6feb' },
+      vertLine: { color: '#cc785c88', labelBackgroundColor: '#cc785c' },
+      horzLine: { color: '#cc785c88', labelBackgroundColor: '#cc785c' },
     },
-    rightPriceScale: { borderColor: '#30363d' },
-    timeScale: { borderColor: '#30363d', timeVisible: true, secondsVisible: false },
+    rightPriceScale: { borderColor: '#e9e5db' },
+    timeScale: { borderColor: '#e9e5db', timeVisible: true, secondsVisible: false },
     handleScroll: true,
     handleScale:  true,
   });
 
   candleSeries = mainChart.addCandlestickSeries({
-    upColor: '#3fb950', downColor: '#f85149',
-    borderUpColor: '#3fb950', borderDownColor: '#f85149',
-    wickUpColor: '#3fb950', wickDownColor: '#f85149',
+    upColor: '#4f9d69', downColor: '#c8503d',
+    borderUpColor: '#4f9d69', borderDownColor: '#c8503d',
+    wickUpColor: '#4f9d69', wickDownColor: '#c8503d',
   });
 
   // Moving-average overlays (share the candles' right price scale)
-  maSeries.ma20  = mainChart.addLineSeries({ color: '#58a6ff', lineWidth: 1,   priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
-  maSeries.ma50  = mainChart.addLineSeries({ color: '#d29922', lineWidth: 1,   priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
-  maSeries.ma200 = mainChart.addLineSeries({ color: '#f85149', lineWidth: 1.5, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
+  maSeries.ma20  = mainChart.addLineSeries({ color: '#5a7fb8', lineWidth: 1,   priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
+  maSeries.ma50  = mainChart.addLineSeries({ color: '#c4863a', lineWidth: 1,   priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
+  maSeries.ma200 = mainChart.addLineSeries({ color: '#c8503d', lineWidth: 1.5, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
 
   volumeSeries = mainChart.addHistogramSeries({
-    color: '#58a6ff22',
+    color: '#cc785c2e',
     priceFormat: { type: 'volume' },
     priceScaleId: 'vol',
   });
@@ -329,25 +329,25 @@ function initCharts() {
   // RSI chart below
   const rsiEl = document.getElementById('rsiContainer');
   rsiChart = LightweightCharts.createChart(rsiEl, {
-    layout:  { background: { color: '#0d1117' }, textColor: '#8b949e' },
-    grid:    { vertLines: { color: '#21262d' }, horzLines: { color: '#21262d' } },
+    layout:  { background: { color: '#fbfaf6' }, textColor: '#8a8478' },
+    grid:    { vertLines: { color: '#efece4' }, horzLines: { color: '#efece4' } },
     crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
-    rightPriceScale: { borderColor: '#30363d', visible: true },
-    timeScale: { borderColor: '#30363d', visible: false },
+    rightPriceScale: { borderColor: '#e9e5db', visible: true },
+    timeScale: { borderColor: '#e9e5db', visible: false },
     handleScroll: false,
     handleScale:  false,
   });
 
   rsiSeries = rsiChart.addLineSeries({
-    color: '#a371f7',
+    color: '#8a72b5',
     lineWidth: 1.5,
     priceLineVisible: false,
   });
 
   // Overbought/oversold reference lines
-  rsiChart.addLineSeries({ color: '#f8514933', lineWidth: 1, lineStyle: 2, priceLineVisible: false })
+  rsiChart.addLineSeries({ color: '#c8503d33', lineWidth: 1, lineStyle: 2, priceLineVisible: false })
           .setData([]);
-  rsiChart.addLineSeries({ color: '#3fb95033', lineWidth: 1, lineStyle: 2, priceLineVisible: false })
+  rsiChart.addLineSeries({ color: '#4f9d6933', lineWidth: 1, lineStyle: 2, priceLineVisible: false })
           .setData([]);
 
   // Sync timescale scrolling
@@ -383,7 +383,7 @@ async function loadChart(symbol, period) {
     volumeSeries.setData(candles.map(c => ({
       time:  c.time,
       value: c.volume,
-      color: c.close >= c.open ? '#3fb95033' : '#f8514933',
+      color: c.close >= c.open ? '#4f9d6944' : '#c8503d44',
     })));
 
     // RSI
@@ -599,6 +599,7 @@ async function init() {
 
   initCharts();
   initSearch();
+  initAsk();
 
   // Period button listeners
   document.querySelectorAll('.period-btn').forEach(btn => {
@@ -950,6 +951,138 @@ function initSearch() {
 
   // Open search directly via #search hash or ?search query (shareable deep-link)
   if (location.hash === '#search' || location.search.includes('search')) setTimeout(openSearch, 400);
+}
+
+// ════════════════════════════════════════════════════
+//  Ask AI — 基于当前页面实时数据的问答(后端调 DeepSeek)
+// ════════════════════════════════════════════════════
+let askBusy = false;
+
+// 收集当前页面的关键数据，作为 AI 的上下文
+function buildPageContext() {
+  const q = quoteData?.quotes || {};
+  const a = analyticsData || {};
+  const m = a.market || {};
+  const allSyms = [...SYMBOLS.indices, ...SYMBOLS.etfs, ...SYMBOLS.mag7, ...SYMBOLS.tech];
+
+  const 行情 = allSyms.map(s => {
+    const x = q[s]; if (!x) return null;
+    return { 代码: s.replace('^',''), 名称: CN_NAMES[s] || s, 价格: x.price, 涨跌幅: x.pct != null ? +x.pct.toFixed(2) : null };
+  }).filter(Boolean);
+
+  const 风险指标 = {};
+  if (a.stocks) for (const s of Object.keys(a.stocks)) {
+    const r = a.stocks[s];
+    风险指标[s.replace('^','')] = { HV20: r.hv20, Beta: r.beta, 当前回撤: r.curDD, 最大回撤: r.maxDD, VaR95: r.var95, 距MA200: r.priceVs200, 连涨跌天: r.streak };
+  }
+
+  return {
+    恐慌指数_0到100越高越恐慌: m.panicScore,
+    恐慌因子明细: m.panicFactors,
+    VIX: m.vix,
+    市场宽度: m.breadth,
+    今日新高数: m.newHigh, 今日新低数: m.newLow,
+    平均相关性: m.avgCorr,
+    大盘历史波动率HV: m.marketHV,
+    杠杆ETF衰减: a.leverage,
+    选中股票: selectedSym ? selectedSym.replace('^','') : null,
+    行情, 风险指标,
+  };
+}
+
+function askRenderIntro() {
+  const box = document.getElementById('askMessages');
+  box.innerHTML = `
+    <div class="ask-intro">
+      <div class="ai-big">✦</div>
+      <h3>问我关于当前市场的问题</h3>
+      <p>我会基于这个页面上的实时数据，<br>用通俗的话帮你解读。</p>
+      <div class="ask-chips">
+        <button class="ask-chip">现在算恐慌吗？</button>
+        <button class="ask-chip">哪只股票风险最高？</button>
+        <button class="ask-chip">恐慌指数是怎么算的？</button>
+        <button class="ask-chip">用一句话总结今天行情</button>
+      </div>
+    </div>`;
+  box.querySelectorAll('.ask-chip').forEach(c =>
+    c.addEventListener('click', () => { document.getElementById('askInput').value = c.textContent; askSubmit(); }));
+}
+
+function askAddMessage(role, html) {
+  const box = document.getElementById('askMessages');
+  box.querySelector('.ask-intro')?.remove();
+  const wrap = document.createElement('div');
+  wrap.className = 'ask-msg ' + role;
+  wrap.innerHTML = `<div class="m-avatar">${role === 'ai' ? '✦' : '🙂'}</div><div class="bubble">${html}</div>`;
+  box.appendChild(wrap);
+  box.scrollTop = box.scrollHeight;
+  return wrap;
+}
+
+function mdToHtml(text) {
+  let h = escapeHtml(text);
+  h = h.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  return h.split(/\n\n+/).map(p => '<p>' + p.replace(/\n/g, '<br>') + '</p>').join('');
+}
+
+async function askSubmit() {
+  if (askBusy) return;
+  const input = document.getElementById('askInput');
+  const question = input.value.trim();
+  if (!question) return;
+  input.value = ''; input.style.height = 'auto';
+  askAddMessage('user', escapeHtml(question));
+
+  askBusy = true;
+  const sendBtn = document.getElementById('askSend');
+  sendBtn.disabled = true;
+  const aiMsg = askAddMessage('ai', '<div class="ask-typing"><span></span><span></span><span></span></div>');
+
+  try {
+    const r = await fetch('/api/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question, context: buildPageContext() }),
+    });
+    const data = await r.json();
+    aiMsg.querySelector('.bubble').innerHTML = data.answer
+      ? mdToHtml(data.answer)
+      : mdToHtml(data.error || 'AI 暂时无法回答，请稍后再试。');
+  } catch (e) {
+    aiMsg.querySelector('.bubble').innerHTML = '网络错误，请稍后再试。';
+  } finally {
+    askBusy = false;
+    sendBtn.disabled = false;
+    const box = document.getElementById('askMessages');
+    box.scrollTop = box.scrollHeight;
+  }
+}
+
+function openAsk() {
+  document.getElementById('askOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('askInput').focus(), 60);
+}
+function closeAsk() { document.getElementById('askOverlay').classList.remove('open'); }
+
+function initAsk() {
+  document.getElementById('askTrigger')?.addEventListener('click', openAsk);
+  document.getElementById('askClose')?.addEventListener('click', closeAsk);
+  document.getElementById('askOverlay')?.addEventListener('click', e => { if (e.target.id === 'askOverlay') closeAsk(); });
+  document.getElementById('askSend')?.addEventListener('click', askSubmit);
+
+  const input = document.getElementById('askInput');
+  input?.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); askSubmit(); }
+  });
+  input?.addEventListener('input', () => {
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && document.getElementById('askOverlay').classList.contains('open')) closeAsk();
+  });
+  askRenderIntro();
+  if (location.hash === '#ask' || location.search.includes('ask')) setTimeout(openAsk, 400);
 }
 
 document.addEventListener('DOMContentLoaded', init);

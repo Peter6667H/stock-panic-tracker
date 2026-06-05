@@ -24,6 +24,10 @@
       <span class="st-text">搜索股票 / 指标…</span>
       <kbd>Ctrl K</kbd>
     </button>
+    <button class="ask-trigger" id="askTrigger">
+      <span class="ai-spark">✦</span>
+      <span class="at-text">问 AI</span>
+    </button>
     <div class="market-status" id="marketStatus">
       <span class="status-dot"></span>
       <span id="statusText">连接中…</span>
@@ -217,6 +221,26 @@
       <span><kbd>↵</kbd>打开</span>
       <span><kbd>esc</kbd>关闭</span>
     </div>
+  </div>
+</div>
+
+<!-- ── Ask AI panel ───────────────────────────────────────── -->
+<div class="ask-overlay" id="askOverlay">
+  <div class="ask-panel" role="dialog" aria-modal="true" aria-label="问 AI">
+    <div class="ask-header">
+      <div class="ask-avatar">✦</div>
+      <div class="ask-htext">
+        <div class="ask-htitle">问 AI</div>
+        <div class="ask-hsub">基于当前页面实时数据回答</div>
+      </div>
+      <button class="ask-close" id="askClose" aria-label="关闭">×</button>
+    </div>
+    <div class="ask-messages" id="askMessages"></div>
+    <div class="ask-input-row">
+      <textarea class="ask-input" id="askInput" rows="1" placeholder="问问当前市场… 比如：现在算恐慌吗？"></textarea>
+      <button class="ask-send" id="askSend" aria-label="发送">➤</button>
+    </div>
+    <div class="ask-disclaimer">AI 基于实时数据生成，仅供参考，不构成投资建议</div>
   </div>
 </div>
 

@@ -7,6 +7,7 @@ import { computeAnalytics } from './analytics.js';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 app.use(express.static(join(__dirname, 'public')));
+app.use(express.json({ limit: '256kb' }));
 
 // ── Symbol config ─────────────────────────────────────────────
 const SYMBOLS = {
@@ -185,6 +186,55 @@ app.get('/api/analytics', async (req, res) => {
     console.error('Analytics error:', e.message);
     if (aCache) return res.json(aCache);
     res.status(500).json({ error: e.message });
+  }
+});
+
+// ── /api/ask — DeepSeek-powered Q&A grounded in live page data ──
+app.post('/api/ask', async (req, res) => {
+  try {
+    const { question, context } = req.body || {};
+    if (!question || typeof question !== 'string') return res.status(400).json({ error: '缺少问题' });
+    const key = process.env.DEEPSEEK_API_KEY;
+    if (!key) return res.status(503).json({ error: 'AI 暂未配置，请稍后再试。' });
+
+    const sys = `你是"美股恐慌仪表盘"网站的 AI 助手，名叫小慌。访客多为不懂金融的普通人(包括老年人)。请严格根据下面提供的【实时页面数据】回答用户问题：
+- 只用数据里有的信息，不要编造数字；数据里没有的就如实说不知道。
+- 用大白话、温和的语气，少用术语；必须用术语时一句话带过解释。
+- 重要结论用 **加粗**。回答尽量控制在 150 字以内，除非用户明确要求详细。
+- 不要给"买入/卖出"等明确投资指令；可以解释现象、风险和常识。
+- 不需要写免责声明(页面底部已有)。`;
+
+    const userMsg = `【实时页面数据】\n${JSON.stringify(context ?? {}, null, 0)}\n\n【用户问题】\n${question}`;
+
+    const ac = new AbortController();
+    const timer = setTimeout(() => ac.abort(), 45_000);
+    let resp;
+    try {
+      resp = await fetch('https://api.deepseek.com/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+        body: JSON.stringify({
+          model: 'deepseek-chat',
+          messages: [{ role: 'system', content: sys }, { role: 'user', content: userMsg }],
+          temperature: 0.5,
+          max_tokens: 700,
+        }),
+        signal: ac.signal,
+      });
+    } finally { clearTimeout(timer); }
+
+    if (!resp.ok) {
+      const t = await resp.text().catch(() => '');
+      console.error('DeepSeek error:', resp.status, t.slice(0, 200));
+      return res.status(502).json({ error: 'AI 服务暂时繁忙，请稍后再试。' });
+    }
+    const j = await resp.json();
+    const answer = j.choices?.[0]?.message?.content?.trim();
+    if (!answer) return res.status(502).json({ error: 'AI 没有返回内容，请重试。' });
+    res.json({ answer });
+  } catch (e) {
+    console.error('Ask error:', e.message);
+    res.status(e.name === 'AbortError' ? 504 : 500).json({ error: 'AI 处理超时或出错，请稍后再试。' });
   }
 });
 
