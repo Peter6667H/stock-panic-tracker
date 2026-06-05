@@ -26,6 +26,47 @@ const PANIC_LEVELS = [
   { min:0,  label:'乐观',     desc:'市场积极，情绪高涨',     color:'#22c55e' },
 ];
 
+// ── Search keyword aliases (代码/中文名之外的可搜词) ──────────
+const SEARCH_ALIASES = {
+  '^IXIC': ['nasdaq', '纳指', '纳斯达克', '综合指数'],
+  '^GSPC': ['s&p', 'sp500', 'spx', '标普', '标准普尔', '大盘'],
+  '^VIX':  ['vix', '恐慌', '波动率', 'fear', 'volatility'],
+  'QQQ':   ['qqq', '纳指etf', '纳斯达克100', 'nasdaq100'],
+  'TQQQ':  ['tqqq', '三倍做多', '3倍做多', '杠杆', 'leverage', 'bull'],
+  'SQQQ':  ['sqqq', '三倍做空', '3倍做空', '做空', '反向', 'bear', 'inverse'],
+  'AAPL':  ['apple', '苹果', 'iphone'],
+  'MSFT':  ['microsoft', '微软', 'windows', 'azure'],
+  'GOOGL': ['google', 'alphabet', '谷歌', '安卓', 'android'],
+  'AMZN':  ['amazon', '亚马逊', 'aws'],
+  'META':  ['meta', 'facebook', '脸书', 'instagram', '元宇宙'],
+  'NVDA':  ['nvidia', '英伟达', '显卡', 'gpu', 'ai', '人工智能'],
+  'TSLA':  ['tesla', '特斯拉', '电动车', '马斯克', 'musk'],
+  'MU':    ['micron', '美光', '内存', '存储', 'memory'],
+  'AMD':   ['amd', '超威', 'cpu', '锐龙', 'ryzen'],
+  'INTC':  ['intel', '英特尔', '酷睿', 'core'],
+};
+
+// ── Searchable metrics / sections (跳转到对应板块) ───────────
+const SEARCH_TERMS = [
+  { name:'综合恐慌指数',   sub:'多因子综合评分 0-100',        target:'sec-panic',     kw:['恐慌','fear','panic','指数','情绪'] },
+  { name:'VIX 恐慌指数',   sub:'市场预期波动率',              target:'sec-panic',     kw:['vix','波动率'] },
+  { name:'市场宽度',       sub:'上涨家数占比 · 普跌=系统性恐慌', target:'sec-structure', kw:['宽度','breadth','上涨家数','涨跌家数'] },
+  { name:'52周新高/新低',  sub:'创新低家数飙升=恐慌扩散',      target:'sec-structure', kw:['新高','新低','52周','high','low'] },
+  { name:'平均相关性',     sub:'抱团度 · 趋近1=齐涨齐跌',      target:'sec-structure', kw:['相关性','correlation','抱团','联动'] },
+  { name:'历史波动率 HV',  sub:'实际波动 vs 预期 VIX',         target:'sec-structure', kw:['hv','历史波动率','波动','volatility'] },
+  { name:'杠杆 ETF',       sub:'QQQ · TQQQ · SQQQ',           target:'sec-etf',       kw:['杠杆','etf','tqqq','sqqq','qqq'] },
+  { name:'科技七姐妹 Mag7', sub:'七大科技龙头股',              target:'sec-mag7',      kw:['mag7','七姐妹','magnificent','科技股','七巨头'] },
+  { name:'半导体 / 科技股', sub:'美光 · AMD · 英特尔',          target:'sec-tech',      kw:['半导体','芯片','semiconductor','chip'] },
+  { name:'风险指标矩阵',   sub:'HV/Beta/回撤/VaR 一览表',      target:'sec-risk',      kw:['风险','矩阵','指标','risk','matrix'] },
+  { name:'Beta 贝塔系数',  sub:'对标普500的波动敏感度',        target:'sec-risk',      kw:['beta','贝塔','敏感度'] },
+  { name:'最大回撤',       sub:'距高点最大跌幅',              target:'sec-risk',      kw:['回撤','drawdown','dd','跌幅'] },
+  { name:'VaR 在险价值',   sub:'95%置信单日最大可能亏损',      target:'sec-risk',      kw:['var','在险价值','风险价值'] },
+  { name:'ATR 真实波幅',   sub:'含跳空的日内波动',            target:'sec-risk',      kw:['atr','真实波幅','波幅'] },
+  { name:'均线 / MA200',   sub:'200日生死线 · 金叉死叉',       target:'sec-risk',      kw:['均线','ma','ma200','生死线','金叉','死叉'] },
+  { name:'杠杆ETF衰减',    sub:'波动损耗 vs 复利增益',         target:'sec-leverage',  kw:['衰减','decay','损耗','复利'] },
+  { name:'K线图表',        sub:'最长20年走势 + 均线 + RSI',    target:'sec-chart',     kw:['k线','图表','chart','走势','rsi','蜡烛'] },
+];
+
 // ── State ─────────────────────────────────────────────────────
 let selectedSym    = 'AAPL';
 let selectedPeriod = '1y';
@@ -557,6 +598,7 @@ async function init() {
   setInterval(updateClock, 1000);
 
   initCharts();
+  initSearch();
 
   // Period button listeners
   document.querySelectorAll('.period-btn').forEach(btn => {
@@ -744,6 +786,170 @@ function renderLeverage(lv) {
   if (lv.tqqq) html += card('TQQQ', '3倍做多 QQQ', lv.tqqq, lv.qqqRet1y);
   if (lv.sqqq) html += card('SQQQ', '3倍做空 QQQ', lv.sqqq, lv.qqqRet1y);
   document.getElementById('leverageGrid').innerHTML = html;
+}
+
+// ════════════════════════════════════════════════════
+//  Search command palette (⌘K / Ctrl+K)
+// ════════════════════════════════════════════════════
+let searchIndex   = [];
+let searchMatches = [];
+let searchActive  = 0;
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
+}
+
+function buildSearchIndex() {
+  const items = [];
+  const allSyms = [...SYMBOLS.indices, ...SYMBOLS.etfs, ...SYMBOLS.mag7, ...SYMBOLS.tech];
+  for (const sym of allSyms) {
+    const cn   = CN_NAMES[sym] || sym;
+    const code = sym.replace('^', '');
+    items.push({
+      type: 'stock', sym,
+      title: code, sub: cn,
+      icon: sym.startsWith('^') ? '📊' : '◆',
+      terms: [code, cn, ...(SEARCH_ALIASES[sym] || [])].map(s => s.toLowerCase()),
+    });
+  }
+  for (const t of SEARCH_TERMS) {
+    items.push({
+      type: 'metric', target: t.target,
+      title: t.name, sub: t.sub, icon: '◈',
+      terms: [t.name, ...(t.kw || [])].map(s => s.toLowerCase()),
+    });
+  }
+  searchIndex = items;
+}
+
+function runSearch(q) {
+  const query = q.trim().toLowerCase();
+  if (!query) {
+    searchMatches = searchIndex.filter(i => i.type === 'stock');
+  } else {
+    searchMatches = searchIndex
+      .filter(i => i.terms.some(t => t.includes(query)))
+      .sort((a, b) => {
+        const ap = a.terms.some(t => t.startsWith(query)) ? 0 : 1;
+        const bp = b.terms.some(t => t.startsWith(query)) ? 0 : 1;
+        return ap - bp;
+      });
+  }
+  searchActive = 0;
+  renderSearchResults(query);
+}
+
+function hl(text, q) {
+  if (!q) return escapeHtml(text);
+  const i = text.toLowerCase().indexOf(q);
+  if (i < 0) return escapeHtml(text);
+  return escapeHtml(text.slice(0, i)) +
+         '<span class="si-hl">' + escapeHtml(text.slice(i, i + q.length)) + '</span>' +
+         escapeHtml(text.slice(i + q.length));
+}
+
+// stocks first, then metrics — matches render order for keyboard nav
+function orderedMatches() {
+  return [...searchMatches.filter(i => i.type === 'stock'),
+          ...searchMatches.filter(i => i.type === 'metric')];
+}
+
+function renderSearchResults(query) {
+  const box = document.getElementById('searchResults');
+  if (!searchMatches.length) {
+    box.innerHTML = `<div class="search-empty"><div class="se-big">⊘</div>没有找到 “${escapeHtml(query)}” 相关的股票或指标</div>`;
+    return;
+  }
+  const stocks  = searchMatches.filter(i => i.type === 'stock');
+  const metrics = searchMatches.filter(i => i.type === 'metric');
+  let idx = 0;
+  const renderItem = it => {
+    const i = idx++;
+    const tagCls = it.type === 'stock' ? 'stock' : 'metric';
+    const tagTxt = it.type === 'stock' ? '股票' : '指标';
+    return `<div class="search-item ${i === searchActive ? 'active' : ''}" data-idx="${i}">
+      <span class="si-icon">${it.icon}</span>
+      <div class="si-body">
+        <div class="si-main">${hl(it.title, query)}</div>
+        <div class="si-sub">${hl(it.sub, query)}</div>
+      </div>
+      <span class="si-tag ${tagCls}">${tagTxt}</span>
+    </div>`;
+  };
+  let html = '';
+  if (stocks.length)  html += `<div class="search-group-title">股票 / 指数 · ${stocks.length}</div>` + stocks.map(renderItem).join('');
+  if (metrics.length) html += `<div class="search-group-title">指标 / 板块 · ${metrics.length}</div>` + metrics.map(renderItem).join('');
+  box.innerHTML = html;
+
+  box.querySelectorAll('.search-item').forEach(el => {
+    el.addEventListener('click',     () => { searchActive = +el.dataset.idx; execSearchActive(); });
+    el.addEventListener('mousemove', () => setActive(+el.dataset.idx));
+  });
+}
+
+function setActive(i) {
+  const items = document.querySelectorAll('#searchResults .search-item');
+  if (!items.length) return;
+  searchActive = Math.max(0, Math.min(i, items.length - 1));
+  items.forEach((el, k) => el.classList.toggle('active', k === searchActive));
+  items[searchActive]?.scrollIntoView({ block: 'nearest' });
+}
+
+function execSearchActive() {
+  const it = orderedMatches()[searchActive];
+  if (!it) return;
+  closeSearch();
+  if (it.type === 'stock') {
+    selectSymbol(it.sym);
+    setTimeout(() => jumpToSection('sec-chart'), 80);
+  } else {
+    jumpToSection(it.target);
+  }
+}
+
+function jumpToSection(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  el.classList.remove('flash-highlight');
+  void el.offsetWidth;                 // force reflow to restart animation
+  el.classList.add('flash-highlight');
+  setTimeout(() => el.classList.remove('flash-highlight'), 1500);
+}
+
+function openSearch() {
+  const ov  = document.getElementById('searchOverlay');
+  const inp = document.getElementById('searchInput');
+  ov.classList.add('open');
+  inp.value = '';
+  runSearch('');
+  setTimeout(() => inp.focus(), 30);
+}
+function closeSearch() {
+  document.getElementById('searchOverlay').classList.remove('open');
+}
+
+function initSearch() {
+  buildSearchIndex();
+  const trigger = document.getElementById('searchTrigger');
+  const overlay = document.getElementById('searchOverlay');
+  const input   = document.getElementById('searchInput');
+
+  trigger?.addEventListener('click', openSearch);
+  input?.addEventListener('input', e => runSearch(e.target.value));
+  overlay?.addEventListener('click', e => { if (e.target === overlay) closeSearch(); });
+
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openSearch(); return; }
+    if (!overlay.classList.contains('open')) return;
+    if      (e.key === 'Escape')    closeSearch();
+    else if (e.key === 'ArrowDown') { e.preventDefault(); setActive(searchActive + 1); }
+    else if (e.key === 'ArrowUp')   { e.preventDefault(); setActive(searchActive - 1); }
+    else if (e.key === 'Enter')     { e.preventDefault(); execSearchActive(); }
+  });
+
+  // Open search directly via #search hash or ?search query (shareable deep-link)
+  if (location.hash === '#search' || location.search.includes('search')) setTimeout(openSearch, 400);
 }
 
 document.addEventListener('DOMContentLoaded', init);

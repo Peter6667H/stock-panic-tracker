@@ -5,3 +5,6 @@ npm-debug.log*
 .env
 _verify.png
 _gauge.png
+_design.png
+shot*.png
+crop*.png

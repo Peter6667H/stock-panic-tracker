@@ -19,6 +19,11 @@
     </div>
   </div>
   <div class="header-right">
+    <button class="search-trigger" id="searchTrigger" aria-label="搜索股票或指标">
+      <span class="st-icon">⌕</span>
+      <span class="st-text">搜索股票 / 指标…</span>
+      <kbd>Ctrl K</kbd>
+    </button>
     <div class="market-status" id="marketStatus">
       <span class="status-dot"></span>
       <span id="statusText">连接中…</span>
@@ -34,7 +39,7 @@
 <main>
 
   <!-- Panic gauge + VIX row -->
-  <section class="panic-section">
+  <section class="panic-section" id="sec-panic">
     <div class="gauge-card">
       <div class="card-title">恐慌指数</div>
       <div class="gauge-wrap">
@@ -74,7 +79,7 @@
   </section>
 
   <!-- Market structure section -->
-  <section class="stock-section">
+  <section class="stock-section" id="sec-structure">
     <h2 class="section-title"><span class="section-icon">🧭</span> 市场结构与情绪 <span class="section-sub">计算衍生指标</span></h2>
     <div class="structure-grid">
       <div class="struct-card">
@@ -102,7 +107,7 @@
   </section>
 
   <!-- ETF section -->
-  <section class="stock-section">
+  <section class="stock-section" id="sec-etf">
     <h2 class="section-title">
       <span class="section-icon">⚡</span> 杠杆 ETF
       <span class="section-sub">QQQ · TQQQ · SQQQ</span>
@@ -111,7 +116,7 @@
   </section>
 
   <!-- Mag7 section -->
-  <section class="stock-section">
+  <section class="stock-section" id="sec-mag7">
     <h2 class="section-title">
       <span class="section-icon">🏆</span> 科技七姐妹 (Mag 7)
     </h2>
@@ -119,7 +124,7 @@
   </section>
 
   <!-- Tech stocks section -->
-  <section class="stock-section">
+  <section class="stock-section" id="sec-tech">
     <h2 class="section-title">
       <span class="section-icon">🔬</span> 半导体 / 科技股
     </h2>
@@ -127,7 +132,7 @@
   </section>
 
   <!-- Risk matrix section -->
-  <section class="stock-section">
+  <section class="stock-section" id="sec-risk">
     <h2 class="section-title"><span class="section-icon">📊</span> 风险指标矩阵 <span class="section-sub">点击行查看图表 · 点列头排序</span></h2>
     <div class="risk-table-wrap">
       <table class="risk-table" id="riskTable">
@@ -153,14 +158,14 @@
   </section>
 
   <!-- Leverage decay section -->
-  <section class="stock-section">
+  <section class="stock-section" id="sec-leverage">
     <h2 class="section-title"><span class="section-icon">⚠️</span> 杠杆ETF衰减分析 <span class="section-sub">近一年 · 实际 vs 理论倍数</span></h2>
     <div class="leverage-grid" id="leverageGrid"></div>
     <p class="lev-note">说明：杠杆ETF每日复利+再平衡，单边上涨时可能跑赢理论倍数（正向复利），震荡市则产生<strong>波动损耗(衰减)</strong>。长期持有需警惕。</p>
   </section>
 
   <!-- Chart section -->
-  <section class="chart-section">
+  <section class="chart-section" id="sec-chart">
     <div class="chart-header">
       <div class="chart-title-wrap">
         <span class="chart-symbol" id="chartSymbol">AAPL</span>
@@ -195,6 +200,25 @@
 <footer class="site-footer">
   <p>数据来源: Yahoo Finance · 延迟约15秒 · 仅供参考，不构成投资建议</p>
 </footer>
+
+<!-- ── Search command palette ─────────────────────────────── -->
+<div class="search-overlay" id="searchOverlay">
+  <div class="search-panel" role="dialog" aria-modal="true" aria-label="搜索">
+    <div class="search-input-wrap">
+      <span class="si-prompt">❯</span>
+      <input type="text" class="search-input" id="searchInput"
+             placeholder="搜索股票代码 / 名称 / 指标术语…"
+             autocomplete="off" spellcheck="false" aria-label="搜索输入">
+      <span class="esc-hint">ESC</span>
+    </div>
+    <div class="search-results" id="searchResults"></div>
+    <div class="search-footer">
+      <span><kbd>↑↓</kbd>导航</span>
+      <span><kbd>↵</kbd>打开</span>
+      <span><kbd>esc</kbd>关闭</span>
+    </div>
+  </div>
+</div>
 
 <script src="app.js"></script>
 </body>
