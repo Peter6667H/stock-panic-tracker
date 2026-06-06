@@ -29,6 +29,134 @@ const HEADERS = {
 let qCache = null, qTime = 0;          // quotes  (15s)
 const hCache = new Map();              // history (1h)  key → { d, t }
 let aCache = null, aTime = 0;          // analytics (5min)
+const newsCache = new Map();           // news per symbol (10min)
+
+// ── News (Yahoo Finance search) ───────────────────────────────
+const NAME_MAP = {
+  '^IXIC': ['纳指','纳斯达克','nasdaq','ixic','综指'],
+  '^GSPC': ['标普','标普500','sp500','s&p','gspc','大盘'],
+  '^VIX':  ['vix','恐慌指数','波动率'],
+  'QQQ':   ['qqq','纳指etf'],
+  'TQQQ':  ['tqqq','三倍做多','3倍做多'],
+  'SQQQ':  ['sqqq','三倍做空','3倍做空','做空'],
+  'AAPL':  ['aapl','苹果','apple','iphone'],
+  'MSFT':  ['msft','微软','microsoft'],
+  'GOOGL': ['googl','谷歌','google','alphabet'],
+  'AMZN':  ['amzn','亚马逊','amazon'],
+  'META':  ['meta','脸书','facebook','扎克伯格'],
+  'NVDA':  ['nvda','英伟达','nvidia','黄仁勋'],
+  'TSLA':  ['tsla','特斯拉','tesla','马斯克','musk'],
+  'MU':    ['mu','美光','micron'],
+  'AMD':   ['amd','超威','苏姿丰'],
+  'INTC':  ['intc','英特尔','intel'],
+};
+const NEWS_QUERY = {
+  '^IXIC':'Nasdaq Composite index', '^GSPC':'S&P 500 index', '^VIX':'VIX volatility stock market',
+  'QQQ':'Invesco QQQ ETF', 'TQQQ':'TQQQ ETF', 'SQQQ':'SQQQ ETF',
+  'AAPL':'Apple AAPL stock', 'MSFT':'Microsoft MSFT stock', 'GOOGL':'Alphabet Google GOOGL stock',
+  'AMZN':'Amazon AMZN stock', 'META':'Meta META stock', 'NVDA':'Nvidia NVDA stock',
+  'TSLA':'Tesla TSLA stock', 'MU':'Micron MU stock', 'AMD':'AMD stock', 'INTC':'Intel INTC stock',
+};
+
+function decodeXml(s) {
+  return String(s)
+    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
+    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"').replace(/&#0?39;/g, "'").replace(/&#x27;/gi, "'").replace(/&apos;/g, "'")
+    .trim();
+}
+
+// 用谷歌新闻 RSS 抓某只股票的最新相关新闻(按代码精准、免费无 key)
+function parseRssNews(xml) {
+  const items = [];
+  const itemRe = /<item>([\s\S]*?)<\/item>/g;
+  let m;
+  while ((m = itemRe.exec(xml)) && items.length < 8) {
+    const block = m[1];
+    let title  = decodeXml((block.match(/<title>([\s\S]*?)<\/title>/) || [])[1] || '');
+    const pub  = decodeXml((block.match(/<source[^>]*>([\s\S]*?)<\/source>/) || [])[1] || '');
+    const dRaw = (block.match(/<pubDate>([\s\S]*?)<\/pubDate>/) || [])[1] || '';
+    if (pub && title.endsWith(' - ' + pub)) title = title.slice(0, -(pub.length + 3)).trim();
+    const time = dRaw ? Math.round(Date.parse(dRaw) / 1000) : 0;
+    if (title) items.push({ title, publisher: pub, time, link: '' });
+  }
+  return items;
+}
+
+async function fetchNews(symbol) {
+  const q = NEWS_QUERY[symbol] || `${symbol} stock`;
+  const url = `https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=en-US&gl=US&ceid=US:en`;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const resp = await fetch(url, { headers: { 'User-Agent': HEADERS['User-Agent'] } });
+      if (resp.ok) {
+        const items = parseRssNews(await resp.text());
+        if (items.length) return items;
+      }
+    } catch { /* retry */ }
+    await new Promise(r => setTimeout(r, 400));
+  }
+  return [];
+}
+
+async function getNewsCached(symbol) {
+  const c = newsCache.get(symbol);
+  if (c && Date.now() - c.t < 600_000) return c.d;
+  const d = await fetchNews(symbol);
+  if (d.length) newsCache.set(symbol, { d, t: Date.now() });   // 只缓存非空，避免偶发空结果被锁住
+  return d.length ? d : (c?.d || []);
+}
+
+function relTimeCN(sec) {
+  if (!sec) return '';
+  const diff = Date.now() / 1000 - sec;
+  if (diff < 3600)  return `${Math.max(1, Math.round(diff / 60))}分钟前`;
+  if (diff < 86400) return `${Math.round(diff / 3600)}小时前`;
+  return `${Math.round(diff / 86400)}天前`;
+}
+
+// 选出与问题相关的股票：问题点名了就只查这些；没点名才用选中股票 + 当日异动最大者兜底
+function pickRelevantSymbols(question, quotes, selected, max = 3) {
+  const ql = (question || '').toLowerCase();
+  const named = [];
+  for (const sym of ALL) {
+    const kws = NAME_MAP[sym] || [sym.toLowerCase()];
+    if (kws.some(k => ql.includes(k))) named.push(sym);
+  }
+  if (named.length) return named.slice(0, max);   // 点名了股票 → 只查这些，最相关
+
+  const picks = [];
+  if (selected) {
+    const want = String(selected).replace('^', '').toUpperCase();
+    const norm = ALL.find(s => s.replace('^', '').toUpperCase() === want);
+    if (norm) picks.push(norm);
+  }
+  if (quotes) {
+    const movers = Object.values(quotes)
+      .filter(q => q && q.symbol && !q.symbol.startsWith('^'))
+      .sort((a, b) => Math.abs(b.pct || 0) - Math.abs(a.pct || 0))
+      .map(q => q.symbol);
+    for (const m of movers) {
+      if (!picks.includes(m)) picks.push(m);
+      if (picks.length >= max) break;
+    }
+  }
+  return picks.slice(0, max);
+}
+
+async function buildNewsBlock(symbols) {
+  const blocks = [];
+  for (let i = 0; i < symbols.length; i++) {
+    if (i > 0) await new Promise(r => setTimeout(r, 250));   // 间隔，避免被谷歌限流
+    const news = await getNewsCached(symbols[i]);
+    if (!news.length) continue;
+    const items = news.slice(0, 4)
+      .map(n => `  - ${n.title}（${n.publisher || '来源未知'}，${relTimeCN(n.time)}）`)
+      .join('\n');
+    blocks.push(`${symbols[i].replace('^', '')}:\n${items}`);
+  }
+  return blocks.join('\n');
+}
 
 // ── Fetch one symbol quote via v8 chart (1d range) ────────────
 async function fetchQuote(symbol) {
@@ -197,14 +325,24 @@ app.post('/api/ask', async (req, res) => {
     const key = process.env.DEEPSEEK_API_KEY;
     if (!key) return res.status(503).json({ error: 'AI 暂未配置，请稍后再试。' });
 
-    const sys = `你是"美股恐慌仪表盘"网站的 AI 助手，名叫小慌。访客多为不懂金融的普通人(包括老年人)。请严格根据下面提供的【实时页面数据】回答用户问题：
-- 只用数据里有的信息，不要编造数字；数据里没有的就如实说不知道。
-- 用大白话、温和的语气，少用术语；必须用术语时一句话带过解释。
-- 重要结论用 **加粗**。回答尽量控制在 150 字以内，除非用户明确要求详细。
-- 不要给"买入/卖出"等明确投资指令；可以解释现象、风险和常识。
-- 不需要写免责声明(页面底部已有)。`;
+    // 抓取与问题相关的实时财经新闻(Yahoo)，作为解释"为什么涨跌"的依据
+    let newsBlock = '', newsPicks = [];
+    try {
+      const { quotes } = await getQuotes();
+      newsPicks = pickRelevantSymbols(question, quotes, context?.选中股票, 3);
+      newsBlock = await buildNewsBlock(newsPicks);
+    } catch (e) { console.warn('news block error:', e.message); }
 
-    const userMsg = `【实时页面数据】\n${JSON.stringify(context ?? {}, null, 0)}\n\n【用户问题】\n${question}`;
+    const sys = `你是"美股恐慌仪表盘"网站的 AI 助手，名叫小慌。访客多为不懂金融的普通人(包括老年人)。请根据下面提供的【实时页面数据】和【相关实时新闻标题】回答用户问题：
+- 只用给到的信息，不要编造数字；数据里没有的就如实说不知道。
+- 当用户问"为什么涨/跌"或原因类问题时，优先依据【相关实时新闻标题】来解释，并点明来源媒体与大致时间(例如"据路透约3小时前报道…")。新闻多为英文，你用中文转述即可。
+- 如果新闻里找不到相关原因，就如实说"目前抓到的新闻里没有明确解释"，绝不编造原因或具体人物言论。
+- 用大白话、温和的语气，少用术语；必须用术语时一句话带过解释。重要结论用 **加粗**。回答尽量控制在 200 字以内，除非用户要求详细。
+- 不给"买入/卖出"等明确投资指令；不需要写免责声明(页面底部已有)。`;
+
+    const userMsg = `【实时页面数据】\n${JSON.stringify(context ?? {}, null, 0)}` +
+      (newsBlock ? `\n\n【相关实时新闻标题】\n${newsBlock}` : '') +
+      `\n\n【用户问题】\n${question}`;
 
     const ac = new AbortController();
     const timer = setTimeout(() => ac.abort(), 45_000);
@@ -217,7 +355,7 @@ app.post('/api/ask', async (req, res) => {
           model: 'deepseek-chat',
           messages: [{ role: 'system', content: sys }, { role: 'user', content: userMsg }],
           temperature: 0.5,
-          max_tokens: 700,
+          max_tokens: 800,
         }),
         signal: ac.signal,
       });
