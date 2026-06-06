@@ -295,29 +295,29 @@ function initCharts() {
   // Main candlestick + volume chart
   const mainEl = document.getElementById('chartContainer');
   mainChart = LightweightCharts.createChart(mainEl, {
-    layout:  { background: { color: '#fbfaf6' }, textColor: '#8a8478' },
-    grid:    { vertLines: { color: '#efece4' }, horzLines: { color: '#efece4' } },
+    layout:  { background: { color: '#0d1b28' }, textColor: '#8ea4b8' },
+    grid:    { vertLines: { color: '#1b3348' }, horzLines: { color: '#1b3348' } },
     crosshair: {
       mode: LightweightCharts.CrosshairMode.Normal,
-      vertLine: { color: '#cc785c88', labelBackgroundColor: '#cc785c' },
-      horzLine: { color: '#cc785c88', labelBackgroundColor: '#cc785c' },
+      vertLine: { color: '#f5c84b88', labelBackgroundColor: '#f5c84b' },
+      horzLine: { color: '#f5c84b88', labelBackgroundColor: '#f5c84b' },
     },
-    rightPriceScale: { borderColor: '#e9e5db' },
-    timeScale: { borderColor: '#e9e5db', timeVisible: true, secondsVisible: false },
+    rightPriceScale: { borderColor: '#234156' },
+    timeScale: { borderColor: '#234156', timeVisible: true, secondsVisible: false },
     handleScroll: true,
     handleScale:  true,
   });
 
   candleSeries = mainChart.addCandlestickSeries({
-    upColor: '#4f9d69', downColor: '#c8503d',
-    borderUpColor: '#4f9d69', borderDownColor: '#c8503d',
-    wickUpColor: '#4f9d69', wickDownColor: '#c8503d',
+    upColor: '#3fd37f', downColor: '#ff4d5a',
+    borderUpColor: '#3fd37f', borderDownColor: '#ff4d5a',
+    wickUpColor: '#3fd37f', wickDownColor: '#ff4d5a',
   });
 
   // Moving-average overlays (share the candles' right price scale)
-  maSeries.ma20  = mainChart.addLineSeries({ color: '#5a7fb8', lineWidth: 1,   priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
-  maSeries.ma50  = mainChart.addLineSeries({ color: '#c4863a', lineWidth: 1,   priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
-  maSeries.ma200 = mainChart.addLineSeries({ color: '#c8503d', lineWidth: 1.5, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
+  maSeries.ma20  = mainChart.addLineSeries({ color: '#4aa3ff', lineWidth: 1,   priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
+  maSeries.ma50  = mainChart.addLineSeries({ color: '#f5c84b', lineWidth: 1,   priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
+  maSeries.ma200 = mainChart.addLineSeries({ color: '#ff6b6b', lineWidth: 1.5, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
 
   volumeSeries = mainChart.addHistogramSeries({
     color: '#cc785c2e',
@@ -329,30 +329,32 @@ function initCharts() {
   // RSI chart below
   const rsiEl = document.getElementById('rsiContainer');
   rsiChart = LightweightCharts.createChart(rsiEl, {
-    layout:  { background: { color: '#fbfaf6' }, textColor: '#8a8478' },
-    grid:    { vertLines: { color: '#efece4' }, horzLines: { color: '#efece4' } },
+    layout:  { background: { color: '#0d1b28' }, textColor: '#8ea4b8' },
+    grid:    { vertLines: { color: '#1b3348' }, horzLines: { color: '#1b3348' } },
     crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
-    rightPriceScale: { borderColor: '#e9e5db', visible: true },
-    timeScale: { borderColor: '#e9e5db', visible: false },
+    rightPriceScale: { borderColor: '#234156', visible: true },
+    timeScale: { borderColor: '#234156', visible: false },
     handleScroll: false,
     handleScale:  false,
   });
 
   rsiSeries = rsiChart.addLineSeries({
-    color: '#8a72b5',
+    color: '#a78bfa',
     lineWidth: 1.5,
     priceLineVisible: false,
   });
 
   // Overbought/oversold reference lines
-  rsiChart.addLineSeries({ color: '#c8503d33', lineWidth: 1, lineStyle: 2, priceLineVisible: false })
+  rsiChart.addLineSeries({ color: '#ff4d5a44', lineWidth: 1, lineStyle: 2, priceLineVisible: false })
           .setData([]);
-  rsiChart.addLineSeries({ color: '#4f9d6933', lineWidth: 1, lineStyle: 2, priceLineVisible: false })
+  rsiChart.addLineSeries({ color: '#3fd37f44', lineWidth: 1, lineStyle: 2, priceLineVisible: false })
           .setData([]);
 
   // Sync timescale scrolling
   mainChart.timeScale().subscribeVisibleTimeRangeChange(range => {
-    if (range) rsiChart.timeScale().setVisibleRange(range);
+    if (range?.from != null && range?.to != null) {
+      try { rsiChart.timeScale().setVisibleRange(range); } catch {}
+    }
   });
 
   // Resize observer
@@ -383,7 +385,7 @@ async function loadChart(symbol, period) {
     volumeSeries.setData(candles.map(c => ({
       time:  c.time,
       value: c.volume,
-      color: c.close >= c.open ? '#4f9d6944' : '#c8503d44',
+      color: c.close >= c.open ? '#3fd37f44' : '#ff4d5a44',
     })));
 
     // RSI
@@ -451,6 +453,41 @@ function renderChartStats(symbol, currency = 'USD') {
 }
 
 // ── Stock card ────────────────────────────────────────────────
+function updateAiInsight() {
+  const regimeEl = document.getElementById('aiRegime');
+  const briefEl = document.getElementById('aiBrief');
+  if (!regimeEl || !briefEl || !quoteData?.quotes) return;
+
+  const quotes = quoteData.quotes;
+  const score = analyticsData?.market?.panicScore ?? calculatePanic(quotes);
+  const level = getPanicLevel(score);
+  const vix = quotes['^VIX'];
+  const nq = quotes['^IXIC'];
+  const sp = quotes['^GSPC'];
+  const breadth = analyticsData?.market?.breadth;
+  const corr = analyticsData?.market?.avgCorr;
+  const lines = [];
+
+  regimeEl.textContent = `${level.label} · ${score}`;
+  regimeEl.style.color = level.color;
+
+  if (vix) {
+    lines.push(`VIX ${fmtPrice(vix.price, '')}，${vix.pct >= 0 ? '上升' : '回落'} ${Math.abs(vix.pct).toFixed(2)}%，反映波动预期${vix.pct >= 0 ? '抬升' : '降温'}。`);
+  }
+  if (nq && sp) {
+    lines.push(`纳指 ${nq.pct >= 0 ? '上涨' : '下跌'} ${Math.abs(nq.pct).toFixed(2)}%，标普500 ${sp.pct >= 0 ? '上涨' : '下跌'} ${Math.abs(sp.pct).toFixed(2)}%，科技权重仍是主要观察点。`);
+  }
+  if (breadth) {
+    const weak = breadth.down > breadth.up;
+    lines.push(`市场宽度 ${breadth.up} 涨 / ${breadth.down} 跌，${weak ? '短线抛压偏广，优先看支撑位' : '上涨家数占优，恐慌扩散暂未放大'}。`);
+  }
+  if (corr != null) {
+    lines.push(`平均相关性 ${corr}，${corr > 0.7 ? '抱团下跌风险较高' : corr > 0.45 ? '联动中等，适合分板块观察' : '分化明显，个股逻辑更重要'}。`);
+  }
+
+  briefEl.innerHTML = lines.slice(0, 4).map(line => `<div class="brief-line">${line}</div>`).join('');
+}
+
 function buildCard(sym, q) {
   if (!q) return `<div class="stock-card"><div class="card-sym">${sym}</div><div class="card-price muted">--</div></div>`;
 
@@ -556,6 +593,7 @@ function renderAll(data) {
 
   // ── Refresh chart stats (if chart is visible)
   renderChartStats(selectedSym);
+  updateAiInsight();
 
   // Attach card click events
   document.querySelectorAll('.stock-card[data-sym], .stat-card[data-sym]').forEach(el => {
@@ -702,6 +740,7 @@ function renderAnalytics(a) {
 
   renderRiskTable();
   renderLeverage(a.leverage);
+  updateAiInsight();
 }
 
 function renderRiskTable() {
@@ -1066,6 +1105,7 @@ function closeAsk() { document.getElementById('askOverlay').classList.remove('op
 
 function initAsk() {
   document.getElementById('askTrigger')?.addEventListener('click', openAsk);
+  document.getElementById('aiInlineAsk')?.addEventListener('click', openAsk);
   document.getElementById('askClose')?.addEventListener('click', closeAsk);
   document.getElementById('askOverlay')?.addEventListener('click', e => { if (e.target.id === 'askOverlay') closeAsk(); });
   document.getElementById('askSend')?.addEventListener('click', askSubmit);

@@ -41,6 +41,7 @@
 
 <!-- ── Main content ───────────────────────────────────────── -->
 <main>
+  <div class="left-rail">
 
   <!-- Panic gauge + VIX row -->
   <section class="panic-section" id="sec-panic">
@@ -109,6 +110,9 @@
       </div>
     </div>
   </section>
+  </div>
+
+  <div class="center-rail">
 
   <!-- ETF section -->
   <section class="stock-section" id="sec-etf">
@@ -167,6 +171,9 @@
     <div class="leverage-grid" id="leverageGrid"></div>
     <p class="lev-note">说明：杠杆ETF每日复利+再平衡，单边上涨时可能跑赢理论倍数（正向复利），震荡市则产生<strong>波动损耗(衰减)</strong>。长期持有需警惕。</p>
   </section>
+  </div>
+
+  <div class="right-rail">
 
   <!-- Chart section -->
   <section class="chart-section" id="sec-chart">
@@ -198,6 +205,26 @@
     </div>
     <div class="chart-stats" id="chartStats"></div>
   </section>
+
+  <section class="ai-insight-section" id="sec-ai-insight">
+    <div class="ai-insight-head">
+      <div>
+        <h2>AI 市场洞察</h2>
+        <p>基于当前页面数据分析</p>
+      </div>
+      <span class="beta-badge">BETA</span>
+    </div>
+    <div class="ai-regime">
+      <span>市场情绪</span>
+      <strong id="aiRegime">载入中</strong>
+    </div>
+    <div class="ai-brief" id="aiBrief">
+      <div class="brief-line">正在读取恐慌指数、VIX、市场宽度与主要指数。</div>
+    </div>
+    <button class="ai-inline-ask" id="aiInlineAsk" type="button">向 AI 提问市场走势、个股分析或策略建议...</button>
+    <div class="ai-foot">深度思考 · 联网搜索</div>
+  </section>
+  </div>
 
 </main>
 
