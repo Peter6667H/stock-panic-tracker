@@ -6,7 +6,7 @@ import { computeAnalytics } from './analytics.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
-app.use(express.static(join(__dirname, 'public')));
+app.use(express.static(join(__dirname, 'dist')));
 app.use(express.json({ limit: '256kb' }));
 
 // ── Symbol config ─────────────────────────────────────────────
@@ -374,6 +374,11 @@ app.post('/api/ask', async (req, res) => {
     console.error('Ask error:', e.message);
     res.status(e.name === 'AbortError' ? 504 : 500).json({ error: 'AI 处理超时或出错，请稍后再试。' });
   }
+});
+
+// SPA fallback — all non-API GET requests serve index.html
+app.get('*', (req, res) => {
+  res.sendFile(join(__dirname, 'dist', 'index.html'));
 });
 
 const PORT = process.env.PORT || 3000;

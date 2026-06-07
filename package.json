@@ -4,7 +4,9 @@
   "description": "美股恐慌指数实时监控仪表盘",
   "type": "module",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "build": "cd frontend && npm install && npm run build",
+    "dev": "node server.js"
   },
   "engines": {
     "node": ">=18"
