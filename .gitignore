@@ -1,6 +1,6 @@
 node_modules/
-dist/
 frontend/node_modules/
+# dist/ 已提交作为 Render 部署兜底（构建产物），改前端后需重新 build 提交
 npm-debug.log*
 *.log
 .DS_Store
