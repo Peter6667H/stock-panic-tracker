@@ -1,4 +1,5 @@
 import { getPanicLevel, fmtPrice, fmtChg, scaleColor } from '../lib/utils.js'
+import { useCountUp } from '../lib/hooks.js'
 import PanicGauge from './PanicGauge.jsx'
 
 function StatMiniCard({ label, children, hint, onClick, selected }) {
@@ -13,6 +14,7 @@ function StatMiniCard({ label, children, hint, onClick, selected }) {
 
 export default function PanicSection({ quotes, analyticsData, panicScore, selectedSym, onSelectSym }) {
   const level = getPanicLevel(panicScore)
+  const displayScore = useCountUp(panicScore)
   const factors = analyticsData?.market?.panicFactors
   const factorItems = factors
     ? [['VIX', factors.vix], ['宽度', factors.breadth], ['回撤', factors.drawdown], ['波动', factors.hv], ['新低', factors.newLow], ['动量', factors.momentum]]
@@ -34,7 +36,7 @@ export default function PanicSection({ quotes, analyticsData, panicScore, select
         <div className="gauge-wrap">
           <PanicGauge score={panicScore} />
           <div className="gauge-center">
-            <div className="panic-score" style={{ color: level.color }}>{panicScore === null ? '--' : panicScore}</div>
+            <div className="panic-score" style={{ color: level.color }}>{displayScore === null ? '--' : displayScore}</div>
             <div className="panic-label" style={{ color: level.color }}>{level.label}</div>
           </div>
         </div>

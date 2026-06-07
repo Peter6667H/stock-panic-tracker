@@ -1,7 +1,9 @@
 import { CN_NAMES } from '../lib/constants.js'
 import { fmtPrice, fmtChg, fmtVol, rangePos } from '../lib/utils.js'
+import { useFlashOnChange } from '../lib/hooks.js'
 
 export default function StockCard({ sym, q, selected, onSelect }) {
+  const flashKey = useFlashOnChange(q?.price)
   if (!q) {
     return (
       <div className="stock-card" onClick={() => onSelect(sym)}>
@@ -25,7 +27,7 @@ export default function StockCard({ sym, q, selected, onSelect }) {
     >
       <div className="card-sym">{sym.replace('^', '')}</div>
       <div className="card-name">{CN_NAMES[sym] || q.name}</div>
-      <div className={`card-price ${chg.cls}`}>{fmtPrice(q.price)}</div>
+      <div key={flashKey} className={`card-price hud-flash ${chg.cls}`}>{fmtPrice(q.price)}</div>
       <div className={`card-chg ${chg.cls}`}>{chg.text}</div>
       <div className="card-footer">
         <div className="range-bar-wrap">
