@@ -3,7 +3,9 @@ services:
     name: stock-panic-tracker
     runtime: node
     plan: free
-    buildCommand: npm install && npm run build
+    # dist/ 已提交进仓库，无需在 Render 上构建前端（避免 free 计划 vite 构建 OOM/超时）
+    # server.js 直接服务提交好的 dist/；改前端后本地 npm run build 再提交即可
+    buildCommand: npm install
     startCommand: npm start
     envVars:
       - key: NODE_VERSION
