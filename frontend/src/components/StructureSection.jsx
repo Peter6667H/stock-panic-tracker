@@ -1,4 +1,4 @@
-export default function StructureSection({ analyticsData }) {
+export default function StructureSection({ analyticsData, bare }) {
   const m = analyticsData?.market
   const b = m?.breadth
   const corr = m?.avgCorr
@@ -17,12 +17,7 @@ export default function StructureSection({ analyticsData }) {
       : `实际波动已超预期 ${prem}：风险或被低估`
     : '趋近1 = 齐涨齐跌(系统性风险)'
 
-  return (
-    <section className="stock-section" id="sec-structure">
-      <h2 className="section-title">
-        <span className="section-icon">🧭</span> 市场结构与情绪
-        <span className="section-sub">计算衍生指标</span>
-      </h2>
+  const grid = (
       <div className="structure-grid">
         <div className="struct-card">
           <div className="struct-label">市场宽度 · 上涨家数</div>
@@ -62,6 +57,17 @@ export default function StructureSection({ analyticsData }) {
           <div className="struct-hint">{hvHint}</div>
         </div>
       </div>
+  )
+
+  if (bare) return <div className="struct-block" id="sec-structure">{grid}</div>
+
+  return (
+    <section className="stock-section" id="sec-structure">
+      <h2 className="section-title">
+        <span className="section-icon">🧭</span> 市场结构与情绪
+        <span className="section-sub">计算衍生指标</span>
+      </h2>
+      {grid}
     </section>
   )
 }

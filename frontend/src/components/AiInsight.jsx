@@ -1,6 +1,6 @@
 import { getPanicLevel, fmtPrice } from '../lib/utils.js'
 
-export default function AiInsight({ quotes, analyticsData, panicScore, onAskOpen }) {
+export default function AiInsight({ quotes, analyticsData, panicScore, onAskOpen, bare }) {
   const level = getPanicLevel(panicScore)
   const m = analyticsData?.market
   const vix = quotes['^VIX']
@@ -25,14 +25,16 @@ export default function AiInsight({ quotes, analyticsData, panicScore, onAskOpen
   }
 
   return (
-    <section className="ai-insight-section" id="sec-ai-insight">
-      <div className="ai-insight-head">
-        <div>
-          <h2>AI 市场洞察</h2>
-          <p>基于当前页面数据分析</p>
+    <section className={`ai-insight-section${bare ? ' bare' : ''}`} id="sec-ai-insight">
+      {!bare && (
+        <div className="ai-insight-head">
+          <div>
+            <h2>AI 市场洞察</h2>
+            <p>基于当前页面数据分析</p>
+          </div>
+          <span className="beta-badge">BETA</span>
         </div>
-        <span className="beta-badge">BETA</span>
-      </div>
+      )}
       <div className="ai-regime">
         <span>市场情绪</span>
         <strong style={{ color: level.color }}>{level.label} · {panicScore ?? '--'}</strong>

@@ -1,23 +1,36 @@
 import StockCard from './StockCard.jsx'
 
-export default function StockSection({ title, icon, sub, id, syms, quotes, selectedSym, onSelectSym }) {
+export default function StockSection({ title, icon, sub, id, syms, quotes, selectedSym, onSelectSym, bare }) {
+  const grid = (
+    <div className="stock-grid">
+      {syms.map(sym => (
+        <StockCard
+          key={sym}
+          sym={sym}
+          q={quotes[sym]}
+          selected={selectedSym === sym}
+          onSelect={onSelectSym}
+        />
+      ))}
+    </div>
+  )
+
+  if (bare) {
+    return (
+      <div className="stock-block" id={id}>
+        <div className="block-label"><span>{title}</span>{sub && <em>{sub}</em>}</div>
+        {grid}
+      </div>
+    )
+  }
+
   return (
     <section className="stock-section" id={id}>
       <h2 className="section-title">
         <span className="section-icon">{icon}</span> {title}
         {sub && <span className="section-sub">{sub}</span>}
       </h2>
-      <div className="stock-grid">
-        {syms.map(sym => (
-          <StockCard
-            key={sym}
-            sym={sym}
-            q={quotes[sym]}
-            selected={selectedSym === sym}
-            onSelect={onSelectSym}
-          />
-        ))}
-      </div>
+      {grid}
     </section>
   )
 }

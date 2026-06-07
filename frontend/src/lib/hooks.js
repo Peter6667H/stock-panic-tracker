@@ -37,6 +37,35 @@ export function useCountUp(target, duration = 650) {
 }
 
 /**
+ * 滚动入场：元素进入视口时给 ref 加 .in-view 类，触发 CSS 揭示动画。
+ * 用法：const ref = useReveal(); <div ref={ref} className="reveal">…</div>
+ */
+export function useReveal({ threshold = 0.15, once = true } = {}) {
+  const ref = useRef(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    if (prefersReduced()) { el.classList.add('in-view'); return }
+    const io = new IntersectionObserver(
+      entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add('in-view')
+            if (once) io.unobserve(e.target)
+          } else if (!once) {
+            e.target.classList.remove('in-view')
+          }
+        })
+      },
+      { threshold, rootMargin: '0px 0px -8% 0px' }
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [threshold, once])
+  return ref
+}
+
+/**
  * 值变更时返回一个递增的 key，配合 CSS .hud-flash 触发背景闪烁。
  * 用法：const flashKey = useFlashOnChange(price)
  *       <span key={flashKey} className="hud-flash">...</span>

@@ -1,4 +1,4 @@
-export default function LeverageSection({ analyticsData }) {
+export default function LeverageSection({ analyticsData, bare }) {
   const lv = analyticsData?.leverage
   if (!lv) return null
 
@@ -36,17 +36,32 @@ export default function LeverageSection({ analyticsData }) {
     )
   }
 
+  const body = (
+    <>
+      <div className="leverage-grid">
+        {lv.tqqq && card('TQQQ', '3倍做多 QQQ', lv.tqqq, lv.qqqRet1y)}
+        {lv.sqqq && card('SQQQ', '3倍做空 QQQ', lv.sqqq, lv.qqqRet1y)}
+      </div>
+      <p className="lev-note">说明：杠杆ETF每日复利+再平衡，单边上涨时可能跑赢理论倍数（正向复利），震荡市则产生<strong>波动损耗(衰减)</strong>。长期持有需警惕。</p>
+    </>
+  )
+
+  if (bare) {
+    return (
+      <div className="lev-block" id="sec-leverage">
+        <div className="block-label"><span>杠杆 ETF 衰减</span><em>近一年 · 实际 vs 理论倍数</em></div>
+        {body}
+      </div>
+    )
+  }
+
   return (
     <section className="stock-section" id="sec-leverage">
       <h2 className="section-title">
         <span className="section-icon">⚠️</span> 杠杆ETF衰减分析
         <span className="section-sub">近一年 · 实际 vs 理论倍数</span>
       </h2>
-      <div className="leverage-grid">
-        {lv.tqqq && card('TQQQ', '3倍做多 QQQ', lv.tqqq, lv.qqqRet1y)}
-        {lv.sqqq && card('SQQQ', '3倍做空 QQQ', lv.sqqq, lv.qqqRet1y)}
-      </div>
-      <p className="lev-note">说明：杠杆ETF每日复利+再平衡，单边上涨时可能跑赢理论倍数（正向复利），震荡市则产生<strong>波动损耗(衰减)</strong>。长期持有需警惕。</p>
+      {body}
     </section>
   )
 }

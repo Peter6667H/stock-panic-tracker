@@ -2,14 +2,17 @@ import { useState } from 'react'
 import { CN_NAMES } from '../lib/constants.js'
 import { fmtPrice } from '../lib/utils.js'
 
-export default function RiskTable({ analyticsData, quoteData, selectedSym, onSelectSym }) {
+export default function RiskTable({ analyticsData, quoteData, selectedSym, onSelectSym, bare }) {
   const [sort, setSort] = useState({ key: 'beta', dir: 'desc' })
 
-  if (!analyticsData?.stocks) return (
-    <section className="stock-section" id="sec-risk">
-      <h2 className="section-title"><span className="section-icon">📊</span> 风险指标矩阵 <span className="section-sub">载入中…</span></h2>
-    </section>
-  )
+  if (!analyticsData?.stocks) {
+    if (bare) return <div className="risk-table-wrap" id="sec-risk"><div className="block-loading">风险数据载入中…</div></div>
+    return (
+      <section className="stock-section" id="sec-risk">
+        <h2 className="section-title"><span className="section-icon">📊</span> 风险指标矩阵 <span className="section-sub">载入中…</span></h2>
+      </section>
+    )
+  }
 
   const quotes = quoteData?.quotes || {}
   const rows = Object.keys(analyticsData.stocks).map(sym => {
@@ -44,13 +47,8 @@ export default function RiskTable({ analyticsData, quoteData, selectedSym, onSel
     >{children}</th>
   )
 
-  return (
-    <section className="stock-section" id="sec-risk">
-      <h2 className="section-title">
-        <span className="section-icon">📊</span> 风险指标矩阵
-        <span className="section-sub">点击行查看图表 · 点列头排序</span>
-      </h2>
-      <div className="risk-table-wrap">
+  const table = (
+      <div className="risk-table-wrap" id="sec-risk">
         <table className="risk-table">
           <thead>
             <tr>
@@ -99,6 +97,17 @@ export default function RiskTable({ analyticsData, quoteData, selectedSym, onSel
           </tbody>
         </table>
       </div>
+  )
+
+  if (bare) return table
+
+  return (
+    <section className="stock-section" id="sec-risk">
+      <h2 className="section-title">
+        <span className="section-icon">📊</span> 风险指标矩阵
+        <span className="section-sub">点击行查看图表 · 点列头排序</span>
+      </h2>
+      {table}
     </section>
   )
 }

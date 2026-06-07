@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
-import { SYMBOLS, CN_NAMES } from './lib/constants.js'
-import { getPanicLevel, calculatePanic, fmtPrice, scaleColor } from './lib/utils.js'
-import Header from './components/Header.jsx'
-import PanicSection from './components/PanicSection.jsx'
+import { SYMBOLS } from './lib/constants.js'
+import { calculatePanic } from './lib/utils.js'
+import SiteNav from './components/SiteNav.jsx'
+import Hero from './components/Hero.jsx'
+import Section from './components/Section.jsx'
 import StructureSection from './components/StructureSection.jsx'
 import StockSection from './components/StockSection.jsx'
 import RiskTable from './components/RiskTable.jsx'
@@ -12,13 +13,14 @@ import AiInsight from './components/AiInsight.jsx'
 import SearchPalette from './components/SearchPalette.jsx'
 import AskPanel from './components/AskPanel.jsx'
 
+const jump = id => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+
 export default function App() {
   const [quoteData, setQuoteData]       = useState(null)
   const [analyticsData, setAnalyticsData] = useState(null)
   const [selectedSym, setSelectedSym]   = useState('AAPL')
   const [selectedPeriod, setSelectedPeriod] = useState('1y')
   const [marketState, setMarketState]   = useState('REGULAR')
-  const [lastUpdate, setLastUpdate]     = useState('--')
   const [searchOpen, setSearchOpen]     = useState(false)
   const [askOpen, setAskOpen]           = useState(false)
 
@@ -30,11 +32,8 @@ export default function App() {
         setQuoteData(d)
         const anyQ = Object.values(d.quotes)[0]
         setMarketState(anyQ?.state || 'REGULAR')
-        setLastUpdate('更新: ' + new Date().toLocaleTimeString('zh-CN'))
       }
-    } catch (e) {
-      console.error('fetchQuotes:', e)
-    }
+    } catch (e) { console.error('fetchQuotes:', e) }
   }, [])
 
   const fetchAnalytics = useCallback(async () => {
@@ -42,9 +41,7 @@ export default function App() {
       const r = await fetch('/api/analytics')
       const d = await r.json()
       if (d.stocks) setAnalyticsData(d)
-    } catch (e) {
-      console.error('fetchAnalytics:', e)
-    }
+    } catch (e) { console.error('fetchAnalytics:', e) }
   }, [])
 
   useEffect(() => {
@@ -55,71 +52,83 @@ export default function App() {
     return () => { clearInterval(q); clearInterval(a) }
   }, [fetchQuotes, fetchAnalytics])
 
-  // Keyboard shortcuts
   useEffect(() => {
     const onKey = e => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault()
-        setSearchOpen(true)
+        e.preventDefault(); setSearchOpen(true)
       }
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
   }, [])
 
+  // 锚点深链：带 #区块 打开时滚动到对应区（可分享 /#leaders 等）
+  useEffect(() => {
+    const id = location.hash.replace('#', '')
+    if (id) setTimeout(() => document.getElementById(id)?.scrollIntoView({ block: 'start' }), 300)
+  }, [])
+
   const quotes = quoteData?.quotes || {}
   const panicScore = analyticsData?.market?.panicScore ?? calculatePanic(quotes)
 
+  // 选股票并滑到图表 —— 网站式联动
+  const pickSym = useCallback(sym => {
+    setSelectedSym(sym)
+    setTimeout(() => jump('chart'), 60)
+  }, [])
+
   return (
     <>
-      <Header
+      <SiteNav
         marketState={marketState}
-        lastUpdate={lastUpdate}
         onSearchOpen={() => setSearchOpen(true)}
         onAskOpen={() => setAskOpen(true)}
       />
 
-      <main>
-        <div className="left-rail">
-          <PanicSection
-            quotes={quotes}
-            analyticsData={analyticsData}
-            panicScore={panicScore}
-            selectedSym={selectedSym}
-            onSelectSym={setSelectedSym}
-          />
-          <StructureSection analyticsData={analyticsData} />
-        </div>
+      <Hero
+        quotes={quotes}
+        panicScore={panicScore}
+        onSelectSym={pickSym}
+        onJump={jump}
+      />
 
-        <div className="center-rail">
-          <StockSection
-            title="杠杆 ETF" icon="⚡" sub="QQQ · TQQQ · SQQQ"
-            id="sec-etf" gridId="etfGrid"
-            syms={SYMBOLS.etfs} quotes={quotes}
-            selectedSym={selectedSym} onSelectSym={setSelectedSym}
-          />
-          <StockSection
-            title="科技七姐妹 (Mag 7)" icon="🏆" sub=""
-            id="sec-mag7" gridId="mag7Grid"
-            syms={SYMBOLS.mag7} quotes={quotes}
-            selectedSym={selectedSym} onSelectSym={setSelectedSym}
-          />
-          <StockSection
-            title="半导体 / 科技股" icon="🔬" sub=""
-            id="sec-tech" gridId="techGrid"
-            syms={SYMBOLS.tech} quotes={quotes}
-            selectedSym={selectedSym} onSelectSym={setSelectedSym}
-          />
-          <RiskTable
-            analyticsData={analyticsData}
-            quoteData={quoteData}
-            selectedSym={selectedSym}
-            onSelectSym={setSelectedSym}
-          />
-          <LeverageSection analyticsData={analyticsData} />
-        </div>
+      <main className="site-main">
+        <Section
+          id="overview" num="01" eyebrow="市场结构 · 情绪"
+          title="是系统性恐慌，还是局部回调？"
+          sub="市场宽度、52周新高新低、相关性、波动溢价——四个角度判断这次下跌的性质。"
+        >
+          <StructureSection analyticsData={analyticsData} bare />
+        </Section>
 
-        <div className="right-rail">
+        <Section
+          id="leaders" num="02" eyebrow="龙头股 · 实时"
+          title="牵动大盘的那几只"
+          sub="杠杆 ETF、科技七姐妹、半导体核心股。点任意一只，下方图表即时联动。"
+        >
+          <StockSection title="杠杆 ETF" sub="QQQ · TQQQ · SQQQ"
+            syms={SYMBOLS.etfs} quotes={quotes} selectedSym={selectedSym} onSelectSym={pickSym} bare />
+          <StockSection title="科技七姐妹 · Mag 7" sub="七大科技龙头"
+            syms={SYMBOLS.mag7} quotes={quotes} selectedSym={selectedSym} onSelectSym={pickSym} bare />
+          <StockSection title="半导体 / 科技股" sub="美光 · AMD · 英特尔"
+            syms={SYMBOLS.tech} quotes={quotes} selectedSym={selectedSym} onSelectSym={pickSym} bare />
+        </Section>
+
+        <Section
+          id="risk" num="03" eyebrow="风险矩阵"
+          title="谁的风险最高？"
+          sub="HV、Beta、回撤、VaR、ATR 一览。点列头排序，点行看图。"
+        >
+          <RiskTable analyticsData={analyticsData} quoteData={quoteData}
+            selectedSym={selectedSym} onSelectSym={pickSym} bare />
+          <LeverageSection analyticsData={analyticsData} bare />
+        </Section>
+
+        <Section
+          id="chart" num="04" eyebrow="个股图表"
+          title="放大看走势"
+          sub="最长 20 年 K 线 + 均线 + RSI + 成交量。点上方任意股票即可切换。"
+        >
           <ChartSection
             selectedSym={selectedSym}
             selectedPeriod={selectedPeriod}
@@ -127,23 +136,36 @@ export default function App() {
             quoteData={quoteData}
             analyticsData={analyticsData}
           />
+        </Section>
+
+        <Section
+          id="ai" num="05" eyebrow="AI 洞察"
+          title="让 AI 帮你读盘"
+          sub="基于实时数据与财经新闻，用大白话解释为什么涨跌、现在该不该慌。"
+        >
           <AiInsight
             quotes={quotes}
             analyticsData={analyticsData}
             panicScore={panicScore}
             onAskOpen={() => setAskOpen(true)}
+            bare
           />
-        </div>
+        </Section>
       </main>
 
-      <footer className="site-footer">
-        <p>数据来源: Yahoo Finance · 延迟约15秒 · 仅供参考，不构成投资建议</p>
+      <footer className="site-footer-lg">
+        <div className="footer-inner">
+          <div className="footer-brand">PANIC<span>·INDEX</span></div>
+          <p className="footer-tag">实时美股市场情绪监控 · 数据来源 Yahoo Finance（延迟约15秒）</p>
+          <p className="footer-disc">本工具仅供参考，不构成任何投资建议。市场有风险，决策需谨慎。</p>
+          <button className="footer-top" onClick={() => jump('hero')}>回到顶部 ↑</button>
+        </div>
       </footer>
 
       <SearchPalette
         open={searchOpen}
         onClose={() => setSearchOpen(false)}
-        onSelectSym={sym => { setSelectedSym(sym); setSearchOpen(false) }}
+        onSelectSym={sym => { pickSym(sym); setSearchOpen(false) }}
       />
       <AskPanel
         open={askOpen}
