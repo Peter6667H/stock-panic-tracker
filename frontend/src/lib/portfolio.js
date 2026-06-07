@@ -66,18 +66,27 @@ export function computePersonal({ holdings, quotes, analytics, marketScore }) {
   })
   const total = rows.reduce((s, r) => s + r.value, 0) || 1
 
-  // 持仓风险：Σ 权重×今日跌幅 / 各股 VaR95 基准 ×50（典型坏日≈50，2×≈100）
+  // 持仓风险：Σ 权重×"有效跌幅" / 各股 VaR95 基准 ×50
+  // 有效跌幅=今日跌幅 × 成本安全垫折扣(有浮盈时大幅降低)
   let posSum = 0
   const breakdown = rows.map(r => {
     const weight = r.value / total
     const drop = Math.max(0, -r.pct)
+    // 成本安全垫：浮盈比例越高，同样跌幅造成的实际恐慌越小
+    let cushion = 0
+    if (r.cost != null && r.cost > 0 && r.price > 0 && r.price > r.cost) {
+      cushion = Math.min(1, (r.price - r.cost) / r.price)
+    }
+    const cushionFactor = Math.max(0, 1 - cushion)
+    const effectiveDrop = drop * cushionFactor
     const a = analytics?.stocks?.[r.sym]
     const norm = Math.max(Math.abs(a?.var95 ?? 0), Math.abs(a?.atrPct ?? 0), 2)
-    const contrib = weight * (drop / norm) * 50
+    const contrib = weight * (effectiveDrop / norm) * 50
     posSum += contrib
     return {
       sym: r.sym, name: CN_NAMES[r.sym] || r.sym,
       weight: Math.round(weight * 100), pct: r.pct, drop,
+      cushion: Math.round(cushion * 100),
       value: r.value, contrib: clamp(contrib, 0, 100),
     }
   }).sort((a, b) => b.contrib - a.contrib)

@@ -115,6 +115,7 @@ export default function MyPanicSection({ quotes, analytics, marketScore, holding
               <span className="mp-risk-sym">{b.sym}</span>
               <span className="mp-risk-name">{b.name}</span>
               <span className="mp-risk-weight">{b.weight}%仓</span>
+              {b.cushion > 0 && <span className="mp-risk-cushion" title={`浮盈 ${b.cushion}%，形成成本安全垫`}>🛡 {b.cushion}%</span>}
               <span className={`mp-risk-chg ${b.pct >= 0 ? 'positive' : 'negative'}`}>{b.pct >= 0 ? '+' : ''}{b.pct.toFixed(2)}%</span>
               <div className="mp-risk-bar"><div className="mp-risk-fill" style={{ width: `${Math.min(100, b.contrib * 1.4)}%` }} /></div>
             </div>

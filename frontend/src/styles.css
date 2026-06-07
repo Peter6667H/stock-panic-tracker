@@ -2010,10 +2010,11 @@ html { scroll-behavior: smooth; scroll-padding-top: 72px; }
 
 /* 持仓风险拆解 */
 .mp-risk-list { display: flex; flex-direction: column; gap: 10px; }
-.mp-risk-row { display: grid; grid-template-columns: 54px 1fr 56px 64px 1.4fr; gap: 12px; align-items: center; font-size: 12.5px; }
+.mp-risk-row { display: grid; grid-template-columns: 54px 1fr 56px auto 64px 1.4fr; gap: 10px; align-items: center; font-size: 12.5px; }
 .mp-risk-sym { font-family: var(--font-mono); font-weight: 800; color: #b8daff; }
 .mp-risk-name { color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mp-risk-weight { font-family: var(--font-mono); color: var(--muted); text-align: right; }
+.mp-risk-cushion { font-family: var(--font-mono); font-size: 11px; color: #22c55e; text-align: center; white-space: nowrap; letter-spacing: -.2px; }
 .mp-risk-chg { font-family: var(--font-mono); font-weight: 700; text-align: right; }
 .mp-risk-bar { height: 8px; background: #0d1a32; border-radius: 5px; overflow: hidden; }
 .mp-risk-fill { height: 100%; border-radius: 5px; background: linear-gradient(90deg, var(--amber), var(--red)); transition: width .5s var(--ease); }
