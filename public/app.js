@@ -191,7 +191,7 @@ function drawGauge(canvas, score) {
   // Background track
   ctx.beginPath();
   ctx.arc(cx, cy, midR, Math.PI, 0, false);
-  ctx.strokeStyle = '#ece9e0';
+  ctx.strokeStyle = '#16293a';
   ctx.lineWidth = trackW + 2;
   ctx.lineCap = 'butt';
   ctx.stroke();
@@ -239,8 +239,8 @@ function drawGauge(canvas, score) {
   ctx.lineTo(14, -baseW / 2);
   ctx.lineTo(14,  baseW / 2);
   ctx.closePath();
-  ctx.fillStyle = '#21201c';
-  ctx.shadowColor = 'rgba(0,0,0,0.2)';
+  ctx.fillStyle = '#edf6ff';
+  ctx.shadowColor = 'rgba(0,0,0,0.4)';
   ctx.shadowBlur = 6;
   ctx.fill();
   ctx.restore();
@@ -248,12 +248,12 @@ function drawGauge(canvas, score) {
   // Center cap
   ctx.beginPath();
   ctx.arc(cx, cy, trackW * 0.38, 0, 2 * Math.PI);
-  ctx.fillStyle = '#21201c';
+  ctx.fillStyle = '#edf6ff';
   ctx.shadowBlur = 0;
   ctx.fill();
   ctx.beginPath();
   ctx.arc(cx, cy, trackW * 0.22, 0, 2 * Math.PI);
-  ctx.fillStyle = '#ffffff';
+  ctx.fillStyle = '#08111b';
   ctx.fill();
 
   // Tick marks + labels
@@ -267,10 +267,10 @@ function drawGauge(canvas, score) {
     ctx.beginPath();
     ctx.moveTo(cx + r1 * Math.cos(ang), cy + r1 * Math.sin(ang));
     ctx.lineTo(cx + r2 * Math.cos(ang), cy + r2 * Math.sin(ang));
-    ctx.strokeStyle = '#d6d0c2';
+    ctx.strokeStyle = '#3b5a72';
     ctx.lineWidth = 1.5;
     ctx.stroke();
-    ctx.fillStyle = '#8a8478';
+    ctx.fillStyle = '#7f95a8';
     ctx.fillText(lbl, cx + rL * Math.cos(ang), cy + rL * Math.sin(ang));
   });
 
@@ -279,7 +279,7 @@ function drawGauge(canvas, score) {
     [0.1, '乐观'], [0.3, '中性'], [0.5, '担忧'], [0.7, '恐慌'], [0.9, '极恐'],
   ];
   ctx.font = `600 ${Math.round(trackW * 0.42)}px system-ui`;
-  ctx.fillStyle = '#57534a';
+  ctx.fillStyle = 'rgba(8,17,27,.85)';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   for (const [r, txt] of zoneLbls) {

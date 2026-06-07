@@ -11,6 +11,10 @@
 @font-face { font-family:'Hanken Grotesk';  src:url('vendor/fonts/hanken-500.woff2') format('woff2'); font-weight:500; font-display:swap; }
 @font-face { font-family:'Hanken Grotesk';  src:url('vendor/fonts/hanken-600.woff2') format('woff2'); font-weight:600; font-display:swap; }
 @font-face { font-family:'Hanken Grotesk';  src:url('vendor/fonts/hanken-700.woff2') format('woff2'); font-weight:700; font-display:swap; }
+@font-face { font-family:'JetBrains Mono';  src:url('vendor/fonts/jetbrains-mono-400.woff2') format('woff2'); font-weight:400; font-display:swap; }
+@font-face { font-family:'JetBrains Mono';  src:url('vendor/fonts/jetbrains-mono-500.woff2') format('woff2'); font-weight:500; font-display:swap; }
+@font-face { font-family:'JetBrains Mono';  src:url('vendor/fonts/jetbrains-mono-700.woff2') format('woff2'); font-weight:700; font-display:swap; }
+@font-face { font-family:'Space Mono';      src:url('vendor/fonts/space-mono-700.woff2') format('woff2'); font-weight:700; font-display:swap; }
 
 /* ── Reset & Variables ──────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -541,33 +545,106 @@ main { max-width: 1320px; margin: 0 auto; padding: 28px 22px 10px; }
 
 /* Trader workspace redesign */
 :root {
+  /* ── Surfaces ── */
   --bg: #08111b;
+  --bg-deep: #050b12;
   --bg-sunken: #0b1724;
   --card: #0f2130;
   --card-2: #0b1a28;
+  --chart-bg: #0d1b28;
   --input: #0a1622;
+  --card-grad: linear-gradient(180deg, rgba(18,39,57,.96), rgba(11,26,40,.98));
+  --app-grad: linear-gradient(180deg, #07111b 0%, #08111b 42%, #050b12 100%);
+
+  /* ── Borders ── */
   --border: #1d384d;
+  --border-soft: rgba(43,83,110,.55);
   --border-strong: #2b536e;
+  --border-hover: #3b6685;
+  --header-line: #173047;
+
+  /* ── Ink ── */
   --text: #edf6ff;
   --text-2: #b4c4d1;
+  --text-3: #9fb1bf;
   --muted: #7f95a8;
+  --on-accent: #ffffff;
+
+  /* ── Coral (primary action) ── */
   --coral: #f0525f;
   --coral-deep: #d83e4b;
+  --coral-bright: #ff6470;
   --coral-soft: rgba(240,82,95,.14);
+  --coral-grad: linear-gradient(180deg, #ff6470, #e54350);
+
+  /* ── Amber (focus / active) ── */
+  --amber: #f5c84b;
+  --amber-soft: rgba(245,200,75,.16);
+  --amber-ring: rgba(245,200,75,.12);
+
+  /* ── Market signal ── */
   --green: #3fd37f;
   --green-soft: rgba(63,211,127,.14);
   --red: #ff4d5a;
   --red-soft: rgba(255,77,90,.14);
-  --amber: #f5c84b;
-  --amber-soft: rgba(245,200,75,.16);
+
+  /* ── Supporting hues ── */
   --blue: #4aa3ff;
+  --blue-soft: rgba(74,163,255,.13);
   --purple: #a78bfa;
+  --orange: #f97316;
+
+  /* ── Panic scale (0 calm → 100 extreme) ── */
+  --panic-0: #22c55e;
+  --panic-1: #84cc16;
+  --panic-2: #eab308;
+  --panic-3: #f97316;
+  --panic-4: #ef4444;
+
+  /* ── Shadows ── */
   --shadow-sm: 0 1px 0 rgba(255,255,255,.03), 0 12px 28px rgba(0,0,0,.14);
   --shadow: 0 1px 0 rgba(255,255,255,.05), 0 18px 42px rgba(0,0,0,.22);
   --shadow-lg: 0 24px 80px rgba(0,0,0,.5);
+  --ring-amber: 0 0 0 2px var(--amber-ring);
+  --ring-coral: 0 0 0 3px var(--coral-soft);
+
+  /* ── Radii ── */
   --radius: 8px;
   --radius-sm: 6px;
   --radius-xs: 4px;
+  --radius-pill: 999px;
+
+  /* ── Typography ── */
+  --font-mono: 'JetBrains Mono', 'Space Mono', ui-monospace, Consolas, monospace;
+  --font-ui:   var(--font-sans);
+  --font-data: var(--font-mono);
+  --font-ticker: var(--font-mono);
+  --fs-display: 45px;
+  --fs-h1: 18px;
+  --fs-h2: 15px;
+  --fs-h3: 14px;
+  --fs-data-xl: 26px;
+  --fs-data-lg: 22px;
+  --fs-body: 13px;
+  --fs-sm: 12px;
+  --fs-xs: 11px;
+  --fs-2xs: 10px;
+
+  /* ── Motion ── */
+  --ease: cubic-bezier(.2,.7,.2,1);
+  --ease-panel: cubic-bezier(.2,.8,.2,1);
+  --dur-fast: .12s;
+  --dur: .18s;
+  --dur-slow: .28s;
+
+  /* ── Layout ── */
+  --rail-left: 304px;
+  --rail-right: 384px;
+  --header-h: 58px;
+  --sticky-top: 72px;
+  --gap-grid: 8px;
+  --pad-card: 14px;
+  --pad-card-sm: 12px;
 }
 
 body {
