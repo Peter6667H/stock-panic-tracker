@@ -4,6 +4,8 @@ import { calculatePanic } from './lib/utils.js'
 import SiteNav from './components/SiteNav.jsx'
 import Hero from './components/Hero.jsx'
 import Section from './components/Section.jsx'
+import MyPanicSection from './components/MyPanicSection.jsx'
+import PortfolioModal from './components/PortfolioModal.jsx'
 import StructureSection from './components/StructureSection.jsx'
 import StockSection from './components/StockSection.jsx'
 import RiskTable from './components/RiskTable.jsx'
@@ -23,6 +25,8 @@ export default function App() {
   const [marketState, setMarketState]   = useState('REGULAR')
   const [searchOpen, setSearchOpen]     = useState(false)
   const [askOpen, setAskOpen]           = useState(false)
+  const [portfolioOpen, setPortfolioOpen] = useState(false)
+  const [holdingsVersion, setHoldingsVersion] = useState(0)
 
   const fetchQuotes = useCallback(async () => {
     try {
@@ -94,7 +98,21 @@ export default function App() {
 
       <main className="site-main">
         <Section
-          id="overview" num="01" eyebrow="市场结构 · 情绪"
+          id="mypanic" num="01" eyebrow="个人化恐慌系数"
+          title="市场在慌，你该慌吗？"
+          sub="录入持仓，结合市场情绪 × 你的仓位风险 × 历史习惯，算出真正属于你的恐慌分。"
+        >
+          <MyPanicSection
+            quotes={quotes}
+            analytics={analyticsData}
+            marketScore={panicScore}
+            holdingsVersion={holdingsVersion}
+            onEdit={() => setPortfolioOpen(true)}
+          />
+        </Section>
+
+        <Section
+          id="overview" num="02" eyebrow="市场结构 · 情绪"
           title="是系统性恐慌，还是局部回调？"
           sub="市场宽度、52周新高新低、相关性、波动溢价——四个角度判断这次下跌的性质。"
         >
@@ -102,7 +120,7 @@ export default function App() {
         </Section>
 
         <Section
-          id="leaders" num="02" eyebrow="龙头股 · 实时"
+          id="leaders" num="03" eyebrow="龙头股 · 实时"
           title="牵动大盘的那几只"
           sub="杠杆 ETF、科技七姐妹、半导体核心股。点任意一只，下方图表即时联动。"
         >
@@ -115,7 +133,7 @@ export default function App() {
         </Section>
 
         <Section
-          id="risk" num="03" eyebrow="风险矩阵"
+          id="risk" num="04" eyebrow="风险矩阵"
           title="谁的风险最高？"
           sub="HV、Beta、回撤、VaR、ATR 一览。点列头排序，点行看图。"
         >
@@ -125,7 +143,7 @@ export default function App() {
         </Section>
 
         <Section
-          id="chart" num="04" eyebrow="个股图表"
+          id="chart" num="05" eyebrow="个股图表"
           title="放大看走势"
           sub="最长 20 年 K 线 + 均线 + RSI + 成交量。点上方任意股票即可切换。"
         >
@@ -139,7 +157,7 @@ export default function App() {
         </Section>
 
         <Section
-          id="ai" num="05" eyebrow="AI 洞察"
+          id="ai" num="06" eyebrow="AI 洞察"
           title="让 AI 帮你读盘"
           sub="基于实时数据与财经新闻，用大白话解释为什么涨跌、现在该不该慌。"
         >
@@ -162,6 +180,12 @@ export default function App() {
         </div>
       </footer>
 
+      <PortfolioModal
+        open={portfolioOpen}
+        onClose={() => setPortfolioOpen(false)}
+        onSaved={() => setHoldingsVersion(v => v + 1)}
+        quotes={quotes}
+      />
       <SearchPalette
         open={searchOpen}
         onClose={() => setSearchOpen(false)}
