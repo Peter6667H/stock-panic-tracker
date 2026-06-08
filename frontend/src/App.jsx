@@ -1,7 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { calculatePanic } from './lib/utils.js'
+import { CN_NAMES } from './lib/constants.js'
+import { getHoldings, setHoldings } from './lib/portfolio.js'
 import SiteNav from './components/SiteNav.jsx'
 import Terminal from './components/Terminal.jsx'
+import ContextMenu from './components/ContextMenu.jsx'
 import Section from './components/Section.jsx'
 import MyPanicSection from './components/MyPanicSection.jsx'
 import PortfolioModal from './components/PortfolioModal.jsx'
@@ -27,6 +30,7 @@ export default function App() {
   const [askStockFocus, setAskStockFocus] = useState(null)
   const [portfolioOpen, setPortfolioOpen] = useState(false)
   const [holdingsVersion, setHoldingsVersion] = useState(0)
+  const [ctxMenu, setCtxMenu]           = useState(null)  // { sym, x, y }
 
   const fetchQuotes = useCallback(async () => {
     try {
@@ -88,6 +92,36 @@ export default function App() {
     setAskOpen(true)
   }, [])
 
+  // 右键个股 → 上下文菜单
+  const openContextStock = useCallback((sym, e) => {
+    e.preventDefault()
+    setCtxMenu({ sym, x: e.clientX, y: e.clientY })
+  }, [])
+
+  const removeHolding = useCallback(sym => {
+    setHoldings(getHoldings().filter(h => h.sym !== sym))
+    setHoldingsVersion(v => v + 1)
+  }, [])
+
+  // 构建右键菜单项（依赖当前持仓状态）
+  const ctxItems = ctxMenu ? (() => {
+    const sym = ctxMenu.sym
+    const code = sym.replace('^', '')
+    const held = getHoldings().some(h => h.sym === sym)
+    const isIndex = sym.startsWith('^')
+    return [
+      { icon: '✦', label: 'DeepSeek 深度分析', onClick: () => openStockAI(sym) },
+      { icon: '📈', label: '设为主图 / 看K线', onClick: () => pickSym(sym) },
+      { sep: true },
+      { icon: '💼', label: held ? '编辑持仓 / 成本' : '加入持仓', disabled: isIndex,
+        onClick: () => setPortfolioOpen(true) },
+      { icon: '✕', label: '取消持仓', danger: true, disabled: !held,
+        onClick: () => removeHolding(sym) },
+      { sep: true },
+      { icon: '⧉', label: '复制代码', onClick: () => { try { navigator.clipboard?.writeText(code) } catch {} } },
+    ]
+  })() : []
+
   return (
     <>
       <SiteNav
@@ -106,6 +140,7 @@ export default function App() {
         selectedPeriod={selectedPeriod}
         onPeriodChange={setSelectedPeriod}
         onAskAI={openStockAI}
+        onContextStock={openContextStock}
       />
 
       <main className="site-main">
@@ -193,6 +228,15 @@ export default function App() {
         selectedSym={selectedSym}
         stockFocus={askStockFocus}
       />
+      {ctxMenu && (
+        <ContextMenu
+          x={ctxMenu.x}
+          y={ctxMenu.y}
+          title={`${ctxMenu.sym.replace('^', '')} · ${CN_NAMES[ctxMenu.sym] || ''}`}
+          items={ctxItems}
+          onClose={() => setCtxMenu(null)}
+        />
+      )}
     </>
   )
 }

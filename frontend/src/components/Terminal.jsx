@@ -20,7 +20,7 @@ function Ticker({ sym, q, onClick }) {
 
 export default function Terminal({
   quotes, quoteData, analyticsData, panicScore,
-  selectedSym, onSelectSym, selectedPeriod, onPeriodChange, onAskAI,
+  selectedSym, onSelectSym, selectedPeriod, onPeriodChange, onAskAI, onContextStock,
 }) {
   const level = getPanicLevel(panicScore)
   const selQuote = quotes[selectedSym]
@@ -44,7 +44,7 @@ export default function Terminal({
       {/* 三栏：自选 | K线 | 个股详情 */}
       <div className="tm-grid">
         <div className="tm-left">
-          <Watchlist quotes={quotes} selectedSym={selectedSym} onSelect={onSelectSym} />
+          <Watchlist quotes={quotes} selectedSym={selectedSym} onSelect={onSelectSym} onContext={onContextStock} />
         </div>
         <div className="tm-center">
           <ChartSection
@@ -61,7 +61,7 @@ export default function Terminal({
       </div>
 
       {/* 底部排行榜 */}
-      <RankingTables quotes={quotes} selectedSym={selectedSym} onSelect={onSelectSym} />
+      <RankingTables quotes={quotes} selectedSym={selectedSym} onSelect={onSelectSym} onContext={onContextStock} />
     </section>
   )
 }

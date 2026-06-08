@@ -39,6 +39,7 @@ export default function StockDetail({ sym, quote: q, analytics, onAskAI }) {
 
   return (
     <div className="stock-detail">
+     <div className="td-scroll">
       {/* 头部：代码 名称 板块 + 大价格 */}
       <div className="td-head">
         <div className="td-head-top">
@@ -101,12 +102,16 @@ export default function StockDetail({ sym, quote: q, analytics, onAskAI }) {
         </div>
       )}
 
-      {/* AI 深度分析按钮 —— 每只票独立 */}
-      <button className="td-ai-btn" onClick={() => onAskAI(sym)}>
-        <span className="td-ai-spark">✦</span> DeepSeek 深度分析 {code}
-        <span className="td-ai-arrow">→</span>
-      </button>
-      <div className="td-ai-hint">基于实时行情 + 个股新闻，用大白话讲清这只票</div>
+     </div>
+
+      {/* AI 深度分析按钮 —— 固定底部，永不被截断 */}
+      <div className="td-foot">
+        <button className="td-ai-btn" onClick={() => onAskAI(sym)}>
+          <span className="td-ai-spark">✦</span> DeepSeek 深度分析 {code}
+          <span className="td-ai-arrow">→</span>
+        </button>
+        <div className="td-ai-hint">基于实时行情 + 个股新闻，用大白话讲清这只票</div>
+      </div>
     </div>
   )
 }

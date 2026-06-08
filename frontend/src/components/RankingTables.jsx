@@ -15,13 +15,14 @@ function buildRows(quotes) {
   }).filter(Boolean)
 }
 
-function Board({ title, rows, metric, fmtMetric, selectedSym, onSelect }) {
+function Board({ title, rows, metric, fmtMetric, selectedSym, onSelect, onContext }) {
   return (
     <div className="rk-board">
       <div className="rk-title">{title}</div>
       <div className="rk-rows">
         {rows.map((r, i) => (
-          <div key={r.sym} className={`rk-row${selectedSym === r.sym ? ' selected' : ''}`} onClick={() => onSelect(r.sym)}>
+          <div key={r.sym} className={`rk-row${selectedSym === r.sym ? ' selected' : ''}`}
+            onClick={() => onSelect(r.sym)} onContextMenu={e => onContext?.(r.sym, e)}>
             <span className="rk-idx">{i + 1}</span>
             <span className="rk-name"><b>{r.code}</b><em>{r.name}</em></span>
             <span className="rk-price">{fmtPrice(r.price, r.cur)}</span>
@@ -33,7 +34,7 @@ function Board({ title, rows, metric, fmtMetric, selectedSym, onSelect }) {
   )
 }
 
-export default function RankingTables({ quotes, selectedSym, onSelect }) {
+export default function RankingTables({ quotes, selectedSym, onSelect, onContext }) {
   const rows = buildRows(quotes)
   if (!rows.length) return null
 
@@ -46,10 +47,10 @@ export default function RankingTables({ quotes, selectedSym, onSelect }) {
 
   return (
     <div className="rankings">
-      <Board title="涨幅榜" rows={gainers} metric={r => r.pct} fmtMetric={pctFmt} selectedSym={selectedSym} onSelect={onSelect} />
-      <Board title="跌幅榜" rows={losers} metric={r => r.pct} fmtMetric={pctFmt} selectedSym={selectedSym} onSelect={onSelect} />
-      <Board title="量比榜 · 资金活跃" rows={active} metric={r => 1} fmtMetric={r => r.volR.toFixed(2) + 'x'} selectedSym={selectedSym} onSelect={onSelect} />
-      <Board title="振幅榜 · 日内波动" rows={ampers} metric={r => 1} fmtMetric={r => r.amp.toFixed(2) + '%'} selectedSym={selectedSym} onSelect={onSelect} />
+      <Board title="涨幅榜" rows={gainers} metric={r => r.pct} fmtMetric={pctFmt} selectedSym={selectedSym} onSelect={onSelect} onContext={onContext} />
+      <Board title="跌幅榜" rows={losers} metric={r => r.pct} fmtMetric={pctFmt} selectedSym={selectedSym} onSelect={onSelect} onContext={onContext} />
+      <Board title="量比榜 · 资金活跃" rows={active} metric={r => 1} fmtMetric={r => r.volR.toFixed(2) + 'x'} selectedSym={selectedSym} onSelect={onSelect} onContext={onContext} />
+      <Board title="振幅榜 · 日内波动" rows={ampers} metric={r => 1} fmtMetric={r => r.amp.toFixed(2) + '%'} selectedSym={selectedSym} onSelect={onSelect} onContext={onContext} />
     </div>
   )
 }

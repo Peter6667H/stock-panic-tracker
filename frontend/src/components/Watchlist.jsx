@@ -9,7 +9,7 @@ const GROUPS = [
   { key: 'tech',    label: '半导体' },
 ]
 
-function Row({ sym, q, selected, onSelect }) {
+function Row({ sym, q, selected, onSelect, onContext }) {
   const flashKey = useFlashOnChange(q?.price)
   const code = sym.replace('^', '')
   const name = CN_NAMES[sym] || q?.name || sym
@@ -17,7 +17,7 @@ function Row({ sym, q, selected, onSelect }) {
 
   if (!q) {
     return (
-      <div className="wl-row" onClick={() => onSelect(sym)}>
+      <div className="wl-row" onClick={() => onSelect(sym)} onContextMenu={e => onContext?.(sym, e)}>
         <div className="wl-name"><span className="wl-code">{code}</span><span className="wl-cn">{name}</span></div>
         <div className="wl-num muted">--</div>
       </div>
@@ -29,7 +29,8 @@ function Row({ sym, q, selected, onSelect }) {
   const cur = (q.currency || 'USD') === 'USD' ? '$' : ''
 
   return (
-    <div className={`wl-row ${up ? 'up' : 'dn'}${selected ? ' selected' : ''}`} onClick={() => onSelect(sym)}>
+    <div className={`wl-row ${up ? 'up' : 'dn'}${selected ? ' selected' : ''}`}
+      onClick={() => onSelect(sym)} onContextMenu={e => onContext?.(sym, e)}>
       <div className="wl-name">
         <span className="wl-code">{code}</span>
         <span className="wl-cn">{name}{sector && <em className="wl-sector">{sector}</em>}</span>
@@ -42,7 +43,7 @@ function Row({ sym, q, selected, onSelect }) {
   )
 }
 
-export default function Watchlist({ quotes, selectedSym, onSelect }) {
+export default function Watchlist({ quotes, selectedSym, onSelect, onContext }) {
   return (
     <div className="watchlist">
       <div className="wl-header">
@@ -54,11 +55,12 @@ export default function Watchlist({ quotes, selectedSym, onSelect }) {
           <div key={g.key} className="wl-group">
             <div className="wl-group-label">{g.label}</div>
             {SYMBOLS[g.key].map(sym => (
-              <Row key={sym} sym={sym} q={quotes[sym]} selected={selectedSym === sym} onSelect={onSelect} />
+              <Row key={sym} sym={sym} q={quotes[sym]} selected={selectedSym === sym} onSelect={onSelect} onContext={onContext} />
             ))}
           </div>
         ))}
       </div>
+      <div className="wl-hint">右键股票 → 更多操作</div>
     </div>
   )
 }
