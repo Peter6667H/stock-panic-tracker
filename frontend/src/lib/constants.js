@@ -13,6 +13,14 @@ export const CN_NAMES = {
   'MU':'美光科技', 'AMD':'AMD', 'INTC':'英特尔',
 }
 
+export const SECTORS = {
+  '^IXIC':'综合指数', '^GSPC':'宽基指数', '^VIX':'波动率',
+  'QQQ':'纳指ETF', 'TQQQ':'3倍做多', 'SQQQ':'3倍做空',
+  'AAPL':'消费电子', 'MSFT':'软件云', 'GOOGL':'互联网',
+  'AMZN':'电商云', 'META':'社交平台', 'NVDA':'AI芯片', 'TSLA':'电动车',
+  'MU':'存储芯片', 'AMD':'半导体', 'INTC':'半导体',
+}
+
 export const PANIC_LEVELS = [
   { min:80, label:'极度恐慌', desc:'市场崩盘模式，极端超卖', color:'#ef4444' },
   { min:60, label:'恐慌',     desc:'大量抛售，情绪极度悲观', color:'#f97316' },

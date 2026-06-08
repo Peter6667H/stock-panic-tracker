@@ -63,13 +63,20 @@ function AiAnswer({ text }) {
 
 const CHIPS = ['现在算恐慌吗？', '哪只股票风险最高？', '恐慌指数是怎么算的？', '用一句话总结今天行情']
 
-export default function AskPanel({ open, onClose, quoteData, analyticsData, selectedSym }) {
+export default function AskPanel({ open, onClose, quoteData, analyticsData, selectedSym, stockFocus }) {
   const [messages, setMessages] = useState([])
   const [inputVal, setInputVal] = useState('')
   const [busy, setBusy]         = useState(false)
   const inputRef  = useRef(null)
   const msgBoxRef = useRef(null)
   const initialized = useRef(false)
+  const firedFor  = useRef(null)   // 记录已自动分析过的个股，避免重复触发
+
+  // 个股焦点：用 selectedSym 兜底
+  const focusSym = stockFocus || null
+  const focusQ   = focusSym ? quoteData?.quotes?.[focusSym] : null
+  const focusCode = focusSym ? focusSym.replace('^', '') : null
+  const focusName = focusSym ? (CN_NAMES[focusSym] || focusQ?.name || focusSym) : null
 
   useEffect(() => {
     if (open) {
@@ -77,6 +84,17 @@ export default function AskPanel({ open, onClose, quoteData, analyticsData, sele
       setTimeout(() => inputRef.current?.focus(), 60)
     }
   }, [open])
+
+  // 打开且带个股焦点 → 自动发起一次该股的深度分析
+  useEffect(() => {
+    if (!open || !focusSym) return
+    if (firedFor.current === focusSym) return
+    firedFor.current = focusSym
+    setMessages([])
+    const pctTxt = focusQ?.pct != null ? `（${focusQ.pct >= 0 ? '+' : ''}${focusQ.pct.toFixed(2)}%）` : ''
+    submit(`深度分析 ${focusName}（${focusCode}）这只股票${pctTxt}：当前价位贵不贵、技术面（均线/RSI/量能）、主要风险、近期消息面，以及短期该不该追/该不该跑。用大白话讲，分点说。`)
+    // eslint-disable-next-line
+  }, [open, focusSym])
 
   useEffect(() => {
     if (msgBoxRef.current) msgBoxRef.current.scrollTop = msgBoxRef.current.scrollHeight
@@ -135,8 +153,14 @@ export default function AskPanel({ open, onClose, quoteData, analyticsData, sele
           <div className="ask-header">
             <div className="ask-avatar">✦</div>
             <div className="ask-htext">
-              <div className="ask-htitle">问 AI</div>
-              <div className="ask-hsub">基于当前页面实时数据回答</div>
+              <div className="ask-htitle">
+                {focusSym ? `${focusCode} · DeepSeek 分析` : '问 AI'}
+              </div>
+              <div className="ask-hsub">
+                {focusSym
+                  ? `${focusName}${focusQ?.pct != null ? ` · ${focusQ.pct >= 0 ? '+' : ''}${focusQ.pct.toFixed(2)}%` : ''} · 基于实时行情与新闻`
+                  : '基于当前页面实时数据回答'}
+              </div>
             </div>
             <button className="ask-close" onClick={onClose} aria-label="关闭">×</button>
           </div>
@@ -172,7 +196,7 @@ export default function AskPanel({ open, onClose, quoteData, analyticsData, sele
               ref={inputRef}
               className="ask-input"
               rows={1}
-              placeholder="问问当前市场… 比如：现在算恐慌吗？"
+              placeholder={focusSym ? '继续追问这只股票…' : '问问当前市场… 比如：现在算恐慌吗？'}
               value={inputVal}
               onChange={e => setInputVal(e.target.value)}
               onKeyDown={onInputKey}

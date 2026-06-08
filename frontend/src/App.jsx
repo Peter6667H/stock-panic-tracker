@@ -1,16 +1,13 @@
 import { useState, useEffect, useCallback } from 'react'
-import { SYMBOLS } from './lib/constants.js'
 import { calculatePanic } from './lib/utils.js'
 import SiteNav from './components/SiteNav.jsx'
-import Hero from './components/Hero.jsx'
+import Terminal from './components/Terminal.jsx'
 import Section from './components/Section.jsx'
 import MyPanicSection from './components/MyPanicSection.jsx'
 import PortfolioModal from './components/PortfolioModal.jsx'
 import StructureSection from './components/StructureSection.jsx'
-import StockSection from './components/StockSection.jsx'
 import RiskTable from './components/RiskTable.jsx'
 import LeverageSection from './components/LeverageSection.jsx'
-import ChartSection from './components/ChartSection.jsx'
 import AiInsight from './components/AiInsight.jsx'
 import MacroSection from './components/MacroSection.jsx'
 import TrumpFeed from './components/TrumpFeed.jsx'
@@ -22,12 +19,12 @@ const jump = id => document.getElementById(id)?.scrollIntoView({ behavior: 'smoo
 export default function App() {
   const [quoteData, setQuoteData]       = useState(null)
   const [analyticsData, setAnalyticsData] = useState(null)
-  const [sparksData, setSparksData]     = useState(null)
-  const [selectedSym, setSelectedSym]   = useState('AAPL')
+  const [selectedSym, setSelectedSym]   = useState('NVDA')
   const [selectedPeriod, setSelectedPeriod] = useState('1y')
   const [marketState, setMarketState]   = useState('REGULAR')
   const [searchOpen, setSearchOpen]     = useState(false)
   const [askOpen, setAskOpen]           = useState(false)
+  const [askStockFocus, setAskStockFocus] = useState(null)
   const [portfolioOpen, setPortfolioOpen] = useState(false)
   const [holdingsVersion, setHoldingsVersion] = useState(0)
 
@@ -51,23 +48,13 @@ export default function App() {
     } catch (e) { console.error('fetchAnalytics:', e) }
   }, [])
 
-  const fetchSparks = useCallback(async () => {
-    try {
-      const r = await fetch('/api/sparks')
-      const d = await r.json()
-      if (d.sparks) setSparksData(d.sparks)
-    } catch (e) { console.error('fetchSparks:', e) }
-  }, [])
-
   useEffect(() => {
     fetchQuotes()
     fetchAnalytics()
-    fetchSparks()
     const q = setInterval(fetchQuotes, 15_000)
     const a = setInterval(fetchAnalytics, 300_000)
-    const s = setInterval(fetchSparks, 300_000)
-    return () => { clearInterval(q); clearInterval(a); clearInterval(s) }
-  }, [fetchQuotes, fetchAnalytics, fetchSparks])
+    return () => { clearInterval(q); clearInterval(a) }
+  }, [fetchQuotes, fetchAnalytics])
 
   useEffect(() => {
     const onKey = e => {
@@ -79,7 +66,7 @@ export default function App() {
     return () => document.removeEventListener('keydown', onKey)
   }, [])
 
-  // 锚点深链：带 #区块 打开时滚动到对应区（可分享 /#leaders 等）
+  // 锚点深链
   useEffect(() => {
     const id = location.hash.replace('#', '')
     if (id) setTimeout(() => document.getElementById(id)?.scrollIntoView({ block: 'start' }), 300)
@@ -88,10 +75,17 @@ export default function App() {
   const quotes = quoteData?.quotes || {}
   const panicScore = analyticsData?.market?.panicScore ?? calculatePanic(quotes)
 
-  // 选股票并滑到图表 —— 网站式联动
-  const pickSym = useCallback(sym => {
+  const pickSym = useCallback(sym => { setSelectedSym(sym) }, [])
+
+  const openStockAI = useCallback(sym => {
     setSelectedSym(sym)
-    setTimeout(() => jump('chart'), 60)
+    setAskStockFocus(sym)
+    setAskOpen(true)
+  }, [])
+
+  const openGeneralAI = useCallback(() => {
+    setAskStockFocus(null)
+    setAskOpen(true)
   }, [])
 
   return (
@@ -99,14 +93,19 @@ export default function App() {
       <SiteNav
         marketState={marketState}
         onSearchOpen={() => setSearchOpen(true)}
-        onAskOpen={() => setAskOpen(true)}
+        onAskOpen={openGeneralAI}
       />
 
-      <Hero
+      <Terminal
         quotes={quotes}
+        quoteData={quoteData}
+        analyticsData={analyticsData}
         panicScore={panicScore}
+        selectedSym={selectedSym}
         onSelectSym={pickSym}
-        onJump={jump}
+        selectedPeriod={selectedPeriod}
+        onPeriodChange={setSelectedPeriod}
+        onAskAI={openStockAI}
       />
 
       <main className="site-main">
@@ -133,20 +132,7 @@ export default function App() {
         </Section>
 
         <Section
-          id="leaders" num="03" eyebrow="龙头股 · 实时"
-          title="牵动大盘的那几只"
-          sub="杠杆 ETF、科技七姐妹、半导体核心股。点任意一只，下方图表即时联动。"
-        >
-          <StockSection title="杠杆 ETF" sub="QQQ · TQQQ · SQQQ"
-            syms={SYMBOLS.etfs} quotes={quotes} selectedSym={selectedSym} onSelectSym={pickSym} bare sparks={sparksData} />
-          <StockSection title="科技七姐妹 · Mag 7" sub="七大科技龙头"
-            syms={SYMBOLS.mag7} quotes={quotes} selectedSym={selectedSym} onSelectSym={pickSym} bare sparks={sparksData} />
-          <StockSection title="半导体 / 科技股" sub="美光 · AMD · 英特尔"
-            syms={SYMBOLS.tech} quotes={quotes} selectedSym={selectedSym} onSelectSym={pickSym} bare sparks={sparksData} />
-        </Section>
-
-        <Section
-          id="macro" num="04" eyebrow="宏观指标 · 全球视野"
+          id="macro" num="03" eyebrow="宏观指标 · 全球视野"
           title="期货、大宗、美债、外汇"
           sub="标普期货反映明日开盘预期，金油走势揭示避险情绪，美债收益率决定科技股估值，外汇折射美元强弱。"
         >
@@ -155,9 +141,9 @@ export default function App() {
         </Section>
 
         <Section
-          id="risk" num="05" eyebrow="风险矩阵"
+          id="risk" num="04" eyebrow="风险矩阵"
           title="谁的风险最高？"
-          sub="HV、Beta、回撤、VaR、ATR 一览。点列头排序，点行看图。"
+          sub="HV、Beta、回撤、VaR、ATR 一览。点列头排序，点行联动上方看盘终端。"
         >
           <RiskTable analyticsData={analyticsData} quoteData={quoteData}
             selectedSym={selectedSym} onSelectSym={pickSym} bare />
@@ -165,21 +151,7 @@ export default function App() {
         </Section>
 
         <Section
-          id="chart" num="06" eyebrow="个股图表"
-          title="放大看走势"
-          sub="最长 20 年 K 线 + 均线 + RSI + 成交量。点上方任意股票即可切换。"
-        >
-          <ChartSection
-            selectedSym={selectedSym}
-            selectedPeriod={selectedPeriod}
-            onPeriodChange={setSelectedPeriod}
-            quoteData={quoteData}
-            analyticsData={analyticsData}
-          />
-        </Section>
-
-        <Section
-          id="ai" num="07" eyebrow="AI 洞察"
+          id="ai" num="05" eyebrow="AI 洞察"
           title="让 AI 帮你读盘"
           sub="基于实时数据与财经新闻，用大白话解释为什么涨跌、现在该不该慌。"
         >
@@ -187,7 +159,7 @@ export default function App() {
             quotes={quotes}
             analyticsData={analyticsData}
             panicScore={panicScore}
-            onAskOpen={() => setAskOpen(true)}
+            onAskOpen={openGeneralAI}
             bare
           />
         </Section>
@@ -198,7 +170,7 @@ export default function App() {
           <div className="footer-brand">PANIC<span>·INDEX</span></div>
           <p className="footer-tag">实时美股市场情绪监控 · 数据来源 Yahoo Finance（延迟约15秒）</p>
           <p className="footer-disc">本工具仅供参考，不构成任何投资建议。市场有风险，决策需谨慎。</p>
-          <button className="footer-top" onClick={() => jump('hero')}>回到顶部 ↑</button>
+          <button className="footer-top" onClick={() => jump('terminal')}>回到顶部 ↑</button>
         </div>
       </footer>
 
@@ -211,7 +183,7 @@ export default function App() {
       <SearchPalette
         open={searchOpen}
         onClose={() => setSearchOpen(false)}
-        onSelectSym={sym => { pickSym(sym); setSearchOpen(false) }}
+        onSelectSym={sym => { pickSym(sym); setSearchOpen(false); jump('terminal') }}
       />
       <AskPanel
         open={askOpen}
@@ -219,6 +191,7 @@ export default function App() {
         quoteData={quoteData}
         analyticsData={analyticsData}
         selectedSym={selectedSym}
+        stockFocus={askStockFocus}
       />
     </>
   )

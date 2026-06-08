@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react'
 
 const LINKS = [
+  { id: 'terminal', label: '看盘' },
   { id: 'mypanic',  label: '组合体检' },
   { id: 'overview', label: '市场' },
-  { id: 'leaders',  label: '龙头股' },
   { id: 'macro',    label: '宏观' },
   { id: 'risk',     label: '风险' },
-  { id: 'chart',    label: '图表' },
   { id: 'ai',       label: 'AI' },
 ]
 
@@ -29,7 +28,7 @@ export default function SiteNav({ marketState, onSearchOpen, onAskOpen }) {
 
   // 滚动间谍：高亮当前所在区
   useEffect(() => {
-    const ids = ['hero', ...LINKS.map(l => l.id)]
+    const ids = LINKS.map(l => l.id)
     const io = new IntersectionObserver(
       entries => {
         entries.forEach(e => { if (e.isIntersecting) setActive(e.target.id) })
@@ -50,7 +49,7 @@ export default function SiteNav({ marketState, onSearchOpen, onAskOpen }) {
   return (
     <nav className={`site-nav${scrolled ? ' scrolled' : ''}`}>
       <div className="nav-inner">
-        <a href="#hero" className="nav-brand" onClick={go('hero')}>
+        <a href="#terminal" className="nav-brand" onClick={go('terminal')}>
           <span className="nav-logo">◮</span>
           <span className="nav-wordmark">PANIC<span className="nav-wordmark-dim">·INDEX</span></span>
           <span className={`nav-live${live ? '' : ' off'}`}>{live ? 'LIVE' : 'CLOSED'}</span>
