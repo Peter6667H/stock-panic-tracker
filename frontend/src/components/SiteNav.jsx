@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react'
 
 const LINKS = [
   { id: 'mypanic',  label: '组合体检' },
-  { id: 'overview', label: '市场总览' },
+  { id: 'overview', label: '市场' },
   { id: 'leaders',  label: '龙头股' },
-  { id: 'risk',     label: '风险矩阵' },
+  { id: 'macro',    label: '宏观' },
+  { id: 'risk',     label: '风险' },
   { id: 'chart',    label: '图表' },
-  { id: 'ai',       label: 'AI 洞察' },
+  { id: 'ai',       label: 'AI' },
 ]
 
 export default function SiteNav({ marketState, onSearchOpen, onAskOpen }) {

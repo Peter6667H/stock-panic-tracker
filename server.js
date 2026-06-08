@@ -376,6 +376,96 @@ app.post('/api/ask', async (req, res) => {
   }
 });
 
+// ── Macro: 期货/大宗/债券/外汇 (30s cache) ──────────────────────
+const MACRO = {
+  futures: ['ES=F', 'NQ=F'],
+  metals:  ['GC=F', 'SI=F'],
+  energy:  ['CL=F', 'BZ=F'],
+  bonds:   ['^TNX'],
+  forex:   ['EURUSD=X', 'GBPUSD=X', 'USDJPY=X'],
+};
+const MACRO_ALL = Object.values(MACRO).flat();
+const MACRO_CN = {
+  'ES=F':'S&P 500期货', 'NQ=F':'纳指100期货',
+  'GC=F':'黄金期货',   'SI=F':'白银期货',
+  'CL=F':'WTI原油',    'BZ=F':'布伦特原油',
+  '^TNX':'10年期美债收益率',
+  'EURUSD=X':'欧元/美元', 'GBPUSD=X':'英镑/美元', 'USDJPY=X':'美元/日元',
+};
+let macroCache = null, macroTime = 0;
+
+app.get('/api/macro', async (req, res) => {
+  try {
+    if (macroCache && Date.now() - macroTime < 30_000) return res.json(macroCache);
+    const results = await Promise.allSettled(MACRO_ALL.map(fetchQuote));
+    const quotes = {};
+    results.forEach((r, i) => {
+      if (r.status === 'fulfilled') {
+        quotes[MACRO_ALL[i]] = { ...r.value, cnName: MACRO_CN[MACRO_ALL[i]] || r.value.name };
+      } else {
+        console.warn(`[WARN] macro ${MACRO_ALL[i]}: ${r.reason?.message}`);
+      }
+    });
+    macroCache = { quotes, groups: MACRO, ts: Date.now() };
+    macroTime = Date.now();
+    res.json(macroCache);
+  } catch (e) {
+    console.error('Macro error:', e.message);
+    if (macroCache) return res.json(macroCache);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ── Trump Truth Social 实时动态 (3min cache) ─────────────────────
+const TRUMP_MARKET_KWS = [
+  'tariff','trade','china','fed','rate','interest','market','stock','economy',
+  'inflation','bank','dollar','oil','gold','sanction','deal','import','export',
+  'tax','wall street','nasdaq','s&p','recession','cut','hike','crypto','bitcoin',
+];
+let trumpCache = null, trumpTime = 0;
+
+async function fetchTrump() {
+  const resp = await fetch('https://www.trumpstruth.org/feed', {
+    headers: { 'User-Agent': HEADERS['User-Agent'] },
+    signal: AbortSignal.timeout(10_000),
+  });
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  const xml = await resp.text();
+  const items = [];
+  const itemRe = /<item>([\s\S]*?)<\/item>/g;
+  let m;
+  while ((m = itemRe.exec(xml)) && items.length < 15) {
+    const block = m[1];
+    const title   = decodeXml((block.match(/<title>([\s\S]*?)<\/title>/)           || [])[1] || '');
+    const desc    = decodeXml((block.match(/<description>([\s\S]*?)<\/description>/)|| [])[1] || '')
+      .replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+    const dRaw    = (block.match(/<pubDate>([\s\S]*?)<\/pubDate>/)                  || [])[1] || '';
+    const origUrl = decodeXml((block.match(/<truth:originalUrl>([\s\S]*?)<\/truth:originalUrl>/) || [])[1]
+      || (block.match(/<link>([\s\S]*?)<\/link>/) || [])[1] || '');
+    const ts      = dRaw ? Math.round(Date.parse(dRaw) / 1000) : 0;
+    const content = desc || title;
+    if (!content) continue;
+    const lower   = content.toLowerCase();
+    const kws     = TRUMP_MARKET_KWS.filter(k => lower.includes(k));
+    items.push({ content: content.slice(0, 600), ts, link: origUrl, isMarketSensitive: kws.length > 0, keywords: kws.slice(0, 6) });
+  }
+  return items;
+}
+
+app.get('/api/trump', async (req, res) => {
+  try {
+    if (trumpCache && Date.now() - trumpTime < 180_000) return res.json(trumpCache);
+    const posts = await fetchTrump();
+    trumpCache = { posts, ts: Date.now() };
+    trumpTime  = Date.now();
+    res.json(trumpCache);
+  } catch (e) {
+    console.error('Trump feed error:', e.message);
+    if (trumpCache) return res.json(trumpCache);
+    res.status(500).json({ error: e.message, posts: [] });
+  }
+});
+
 // SPA fallback — all non-API GET requests serve index.html
 app.get('*', (req, res) => {
   res.sendFile(join(__dirname, 'dist', 'index.html'));

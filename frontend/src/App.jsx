@@ -12,6 +12,8 @@ import RiskTable from './components/RiskTable.jsx'
 import LeverageSection from './components/LeverageSection.jsx'
 import ChartSection from './components/ChartSection.jsx'
 import AiInsight from './components/AiInsight.jsx'
+import MacroSection from './components/MacroSection.jsx'
+import TrumpFeed from './components/TrumpFeed.jsx'
 import SearchPalette from './components/SearchPalette.jsx'
 import AskPanel from './components/AskPanel.jsx'
 
@@ -133,7 +135,16 @@ export default function App() {
         </Section>
 
         <Section
-          id="risk" num="04" eyebrow="风险矩阵"
+          id="macro" num="04" eyebrow="宏观指标 · 全球视野"
+          title="期货、大宗、美债、外汇"
+          sub="标普期货反映明日开盘预期，金油走势揭示避险情绪，美债收益率决定科技股估值，外汇折射美元强弱。"
+        >
+          <MacroSection />
+          <TrumpFeed />
+        </Section>
+
+        <Section
+          id="risk" num="05" eyebrow="风险矩阵"
           title="谁的风险最高？"
           sub="HV、Beta、回撤、VaR、ATR 一览。点列头排序，点行看图。"
         >
@@ -143,7 +154,7 @@ export default function App() {
         </Section>
 
         <Section
-          id="chart" num="05" eyebrow="个股图表"
+          id="chart" num="06" eyebrow="个股图表"
           title="放大看走势"
           sub="最长 20 年 K 线 + 均线 + RSI + 成交量。点上方任意股票即可切换。"
         >
@@ -157,7 +168,7 @@ export default function App() {
         </Section>
 
         <Section
-          id="ai" num="06" eyebrow="AI 洞察"
+          id="ai" num="07" eyebrow="AI 洞察"
           title="让 AI 帮你读盘"
           sub="基于实时数据与财经新闻，用大白话解释为什么涨跌、现在该不该慌。"
         >
