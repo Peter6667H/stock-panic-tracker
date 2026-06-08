@@ -1984,7 +1984,7 @@ html { scroll-behavior: smooth; scroll-padding-top: 72px; }
   background: linear-gradient(180deg, rgba(10,22,40,.95), rgba(6,12,28,.97));
   border: 1px solid var(--border); border-radius: 16px; padding: 22px;
 }
-.mp-card-title { font-family: var(--font-mono); font-size: 12.5px; font-weight: 700; letter-spacing: .5px; color: #c0dcf0; margin-bottom: 16px; }
+.mp-card-title { font-family: var(--font-mono); font-size: 12.5px; font-weight: 700; letter-spacing: .5px; color: #c0dcf0; margin-bottom: 11px; }
 .mp-card-title em { font-style: normal; font-family: var(--font-sans); font-weight: 400; font-size: 11.5px; color: var(--muted); margin-left: 8px; }
 
 /* 顶部：个人分 vs 市场分 + 因子 */
@@ -2055,8 +2055,8 @@ html { scroll-behavior: smooth; scroll-padding-top: 72px; }
 .mp-comm-note { margin-top: 12px; font-size: 11px; color: var(--muted); }
 
 /* 历史日记 */
-.mp-hist-list { display: flex; flex-direction: column; gap: 8px; }
-.mp-hist-row { display: flex; align-items: center; gap: 16px; padding: 10px 14px; background: #0a1426; border: 1px solid var(--border); border-radius: 10px; font-size: 12.5px; }
+.mp-hist-list { display: flex; flex-direction: column; gap: 6px; }
+.mp-hist-row { display: flex; align-items: center; gap: 12px; padding: 8px 12px; background: #0a1426; border: 1px solid var(--border); border-radius: 9px; font-size: 12.5px; }
 .mp-hist-date { font-family: var(--font-mono); color: var(--text-3); width: 44px; }
 .mp-hist-score b { font-family: var(--font-mono); color: var(--coral-bright); font-size: 15px; }
 .mp-hist-market { color: var(--muted); }
@@ -2074,68 +2074,68 @@ html { scroll-behavior: smooth; scroll-padding-top: 72px; }
 
 /* 体检结论条 */
 .mp-verdict {
-  position: relative; display: flex; align-items: center; gap: 24px; padding: 22px 26px;
-  border: 1px solid var(--border); border-radius: 16px;
+  position: relative; display: flex; align-items: center; gap: 18px; padding: 15px 20px;
+  border: 1px solid var(--border); border-radius: 13px;
   background: linear-gradient(180deg, rgba(10,22,40,.95), rgba(6,12,28,.97));
 }
 .mp-verdict-grade {
-  flex-shrink: 0; font-family: var(--font-mono); font-weight: 800; font-size: clamp(28px, 4vw, 44px);
-  letter-spacing: 1px; line-height: 1; padding-right: 24px; border-right: 1px solid var(--border);
+  flex-shrink: 0; font-family: var(--font-mono); font-weight: 800; font-size: clamp(24px, 3.2vw, 36px);
+  letter-spacing: 1px; line-height: 1; padding-right: 18px; border-right: 1px solid var(--border);
 }
 .mp-v-solid .mp-verdict-grade { color: var(--green); text-shadow: 0 0 24px rgba(16,217,122,.4); }
 .mp-v-mid .mp-verdict-grade   { color: var(--amber); text-shadow: 0 0 24px rgba(245,200,75,.35); }
 .mp-v-weak .mp-verdict-grade  { color: var(--red);   text-shadow: 0 0 24px rgba(255,77,90,.4); }
 .mp-v-solid { border-color: rgba(16,217,122,.3); }
 .mp-v-weak  { border-color: rgba(255,77,90,.32); }
-.mp-verdict-text { font-size: clamp(15px, 1.8vw, 18px); font-weight: 700; color: #eaf4ff; line-height: 1.5; }
-.mp-verdict-meta { margin-top: 8px; font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); }
+.mp-verdict-text { font-size: clamp(14px, 1.6vw, 16.5px); font-weight: 700; color: #eaf4ff; line-height: 1.45; }
+.mp-verdict-meta { margin-top: 5px; font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); }
 
 /* 卡片通用底 */
 .mp-stress-card, .mp-metric-card, .mp-moat-card, .mp-aux-card {
   background: linear-gradient(180deg, rgba(10,22,40,.95), rgba(6,12,28,.97));
-  border: 1px solid var(--border); border-radius: 16px; padding: 22px;
+  border: 1px solid var(--border); border-radius: 13px; padding: 15px 16px;
 }
 
 /* 压力测试 */
-.mp-scen-tabs { display: flex; gap: 8px; margin-bottom: 18px; }
+.mp-scen-tabs { display: flex; gap: 7px; margin-bottom: 12px; }
 .mp-scen-tab {
-  cursor: pointer; flex: 1; padding: 11px; font-family: var(--font-mono); font-size: 13px; font-weight: 700;
-  color: var(--text-3); background: #0a1426; border: 1px solid var(--border); border-radius: 10px;
+  cursor: pointer; flex: 1; padding: 8px; font-family: var(--font-mono); font-size: 12.5px; font-weight: 700;
+  color: var(--text-3); background: #0a1426; border: 1px solid var(--border); border-radius: 9px;
   transition: all .16s;
 }
 .mp-scen-tab:hover { color: var(--text); border-color: var(--border-strong); }
 .mp-scen-tab.active { color: #04121c; background: linear-gradient(135deg, #22d3ee, #6366f1); border-color: transparent; box-shadow: 0 4px 16px rgba(6,182,212,.3); }
-.mp-scen-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
-.mp-scen-stat { text-align: center; padding: 16px 8px; background: #0a1426; border: 1px solid var(--border); border-radius: 12px; }
-.mp-scen-num { display: block; font-family: var(--font-mono); font-weight: 700; font-size: clamp(22px, 3vw, 30px); color: #dff1ff; line-height: 1; }
-.mp-scen-lbl { display: block; margin-top: 8px; font-size: 11px; color: var(--muted); }
-.mp-scen-breach { font-size: 13px; color: #ffd9c2; line-height: 1.7; padding: 14px 16px; background: rgba(255,77,90,.08); border: 1px solid rgba(255,77,90,.28); border-radius: 12px; }
+.mp-scen-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 11px; }
+.mp-scen-stat { text-align: center; padding: 11px 8px; background: #0a1426; border: 1px solid var(--border); border-radius: 10px; }
+.mp-scen-num { display: block; font-family: var(--font-mono); font-weight: 700; font-size: clamp(20px, 2.6vw, 26px); color: #dff1ff; line-height: 1; }
+.mp-scen-lbl { display: block; margin-top: 5px; font-size: 10.5px; color: var(--muted); }
+.mp-scen-breach { font-size: 12.5px; color: #ffd9c2; line-height: 1.6; padding: 11px 13px; background: rgba(255,77,90,.08); border: 1px solid rgba(255,77,90,.28); border-radius: 10px; }
 .mp-scen-breach b { color: var(--red); }
 .mp-breach-pill { display: inline-block; margin: 6px 6px 0 0; font-family: var(--font-mono); font-size: 11px; color: #ffc7bd; background: rgba(255,77,90,.12); border: 1px solid rgba(255,77,90,.3); border-radius: 20px; padding: 3px 10px; }
-.mp-scen-safe { font-size: 13px; color: #b8f0d0; line-height: 1.6; padding: 14px 16px; background: rgba(16,217,122,.08); border: 1px solid rgba(16,217,122,.26); border-radius: 12px; }
+.mp-scen-safe { font-size: 12.5px; color: #b8f0d0; line-height: 1.55; padding: 11px 13px; background: rgba(16,217,122,.08); border: 1px solid rgba(16,217,122,.26); border-radius: 10px; }
 
 /* 集中度 + 杠杆 */
 .mp-metrics-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.mp-metric-main { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; }
-.mp-metric-num { font-family: var(--font-mono); font-weight: 800; font-size: clamp(28px, 4vw, 38px); line-height: 1; }
+.mp-metric-main { display: flex; align-items: baseline; gap: 10px; margin-bottom: 11px; }
+.mp-metric-num { font-family: var(--font-mono); font-weight: 800; font-size: clamp(24px, 3.2vw, 32px); line-height: 1; }
 .conc-high, .lev-high { color: var(--red); }
 .conc-mid, .lev-mid { color: var(--amber); }
 .conc-low, .lev-low { color: var(--green); }
-.mp-metric-unit { font-size: 12px; color: var(--text-3); }
-.mp-metric-bars { display: flex; flex-direction: column; gap: 7px; margin-bottom: 14px; }
-.mp-conc-bar { position: relative; height: 22px; background: #0a1426; border-radius: 6px; overflow: hidden; }
+.mp-metric-unit { font-size: 11.5px; color: var(--text-3); }
+.mp-metric-bars { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+.mp-conc-bar { position: relative; height: 19px; background: #0a1426; border-radius: 6px; overflow: hidden; }
 .mp-conc-fill { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, rgba(34,211,238,.5), rgba(99,102,241,.45)); border-radius: 6px; transition: width .6s var(--ease); }
 .mp-conc-tag { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-family: var(--font-mono); font-size: 11px; color: #eaf4ff; }
-.mp-metric-note { font-size: 12px; color: var(--text-3); line-height: 1.55; }
+.mp-metric-note { font-size: 11.5px; color: var(--text-3); line-height: 1.5; }
 .mp-metric-note b { color: #dff1ff; font-family: var(--font-mono); }
-.mp-lev-scale { margin-bottom: 14px; }
+.mp-lev-scale { margin-bottom: 10px; }
 .mp-lev-track { position: relative; height: 8px; background: linear-gradient(90deg, #10d97a, #f5c84b 40%, #ff4d5a); border-radius: 5px; }
 .mp-lev-marker { position: absolute; top: 50%; width: 14px; height: 14px; background: #fff; border: 2px solid #06121f; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 10px rgba(255,255,255,.5); transition: left .5s var(--ease); }
 .mp-lev-ticks { display: flex; justify-content: space-between; margin-top: 6px; font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
 
 /* 持仓护城河表 */
 .mp-moat-head, .mp-moat-row { display: grid; grid-template-columns: 1.6fr 54px 48px 70px 96px 110px; gap: 10px; align-items: center; }
-.mp-moat-head { padding: 0 4px 10px; border-bottom: 1px solid var(--border); font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); letter-spacing: .3px; }
+.mp-moat-head { padding: 0 4px 8px; border-bottom: 1px solid var(--border); font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); letter-spacing: .3px; }
 .mp-moat-head span:not(:first-child), .mp-moat-row > span:not(.mp-moat-sym) { text-align: right; }
 .mp-moat-list { display: flex; flex-direction: column; }
 .mp-moat-row { padding: 12px 4px; border-bottom: 1px solid rgba(255,255,255,.04); font-size: 12.5px; }
@@ -2151,24 +2151,24 @@ html { scroll-behavior: smooth; scroll-padding-top: 72px; }
 
 /* 辅助：情绪因子 + 纪律分 */
 .mp-aux-row { display: grid; grid-template-columns: 1.15fr 1fr; gap: 16px; }
-.mp-emo { display: flex; align-items: center; gap: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
-.mp-emo-num { font-family: var(--font-mono); font-weight: 800; font-size: 40px; line-height: 1; }
-.mp-emo-lbl { display: block; font-size: 11px; color: var(--muted); margin-top: 4px; }
-.mp-emo-vs { display: flex; flex-direction: column; gap: 6px; font-family: var(--font-mono); font-size: 13px; color: var(--text-3); }
-.mp-emo-advice { border-left: 3px solid var(--coral); padding-left: 14px; }
+.mp-emo { display: flex; align-items: center; gap: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
+.mp-emo-num { font-family: var(--font-mono); font-weight: 800; font-size: 34px; line-height: 1; }
+.mp-emo-lbl { display: block; font-size: 11px; color: var(--muted); margin-top: 3px; }
+.mp-emo-vs { display: flex; flex-direction: column; gap: 5px; font-family: var(--font-mono); font-size: 12.5px; color: var(--text-3); }
+.mp-emo-advice { border-left: 3px solid var(--coral); padding-left: 12px; }
 .mp-emo-advice.mp-tone-high { border-left-color: var(--red); }
 .mp-emo-advice.mp-tone-mid { border-left-color: var(--amber); }
 .mp-emo-advice.mp-tone-calm { border-left-color: var(--green); }
-.mp-emo-advice p { font-size: 13px; line-height: 1.65; color: var(--text-2); margin-bottom: 12px; }
-.mp-disc-main { margin-bottom: 16px; }
-.mp-disc-num { font-family: var(--font-mono); font-weight: 800; font-size: 40px; color: var(--green); line-height: 1; }
-.mp-disc-lbl { display: block; font-size: 11px; color: var(--muted); margin-top: 6px; }
+.mp-emo-advice p { font-size: 12.5px; line-height: 1.6; color: var(--text-2); margin-bottom: 9px; }
+.mp-disc-main { margin-bottom: 11px; }
+.mp-disc-num { font-family: var(--font-mono); font-weight: 800; font-size: 34px; color: var(--green); line-height: 1; }
+.mp-disc-lbl { display: block; font-size: 11px; color: var(--muted); margin-top: 5px; }
 .mp-disc-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
-.mp-disc-stats > div { padding: 12px 6px; background: #0a1426; border: 1px solid var(--border); border-radius: 10px; }
-.mp-disc-stats b { display: block; font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: #dff1ff; }
+.mp-disc-stats > div { padding: 10px 6px; background: #0a1426; border: 1px solid var(--border); border-radius: 10px; }
+.mp-disc-stats b { display: block; font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: #dff1ff; }
 .mp-disc-stats span { font-size: 10.5px; color: var(--muted); }
-.mp-disc-note { margin-top: 14px; font-size: 12px; color: var(--text-3); line-height: 1.55; }
-.mp-disc-empty p { font-size: 13px; color: var(--text-3); line-height: 1.7; }
+.mp-disc-note { margin-top: 10px; font-size: 11.5px; color: var(--text-3); line-height: 1.5; }
+.mp-disc-empty p { font-size: 12.5px; color: var(--text-3); line-height: 1.6; }
 .mp-disc-empty b { color: #cfe9ff; }
 
 /* ── 持仓录入弹窗 ─────────────────────────────────────────── */
