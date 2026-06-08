@@ -2064,9 +2064,112 @@ html { scroll-behavior: smooth; scroll-padding-top: 72px; }
 .mp-hist-decision.positive { background: rgba(16,217,122,.12); }
 .mp-hist-decision.negative { background: rgba(255,77,90,.12); }
 
-.mp-edit-row { text-align: center; }
+.mp-edit-row { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
 .mp-edit-btn { cursor: pointer; font-family: var(--font-mono); font-size: 12px; color: var(--text-3); background: rgba(6,12,26,.6); border: 1px solid var(--border); border-radius: 8px; padding: 9px 18px; transition: border-color .18s, color .18s; }
 .mp-edit-btn:hover { border-color: var(--coral); color: var(--coral-bright); }
+.mp-edit-hint { font-size: 11.5px; color: var(--muted); }
+
+/* ══════ 组合体检 V2（硬指标：压力测试 / 集中度 / 杠杆 / 护城河）══════ */
+.mypanic { display: flex; flex-direction: column; gap: 16px; }
+
+/* 体检结论条 */
+.mp-verdict {
+  position: relative; display: flex; align-items: center; gap: 24px; padding: 22px 26px;
+  border: 1px solid var(--border); border-radius: 16px;
+  background: linear-gradient(180deg, rgba(10,22,40,.95), rgba(6,12,28,.97));
+}
+.mp-verdict-grade {
+  flex-shrink: 0; font-family: var(--font-mono); font-weight: 800; font-size: clamp(28px, 4vw, 44px);
+  letter-spacing: 1px; line-height: 1; padding-right: 24px; border-right: 1px solid var(--border);
+}
+.mp-v-solid .mp-verdict-grade { color: var(--green); text-shadow: 0 0 24px rgba(16,217,122,.4); }
+.mp-v-mid .mp-verdict-grade   { color: var(--amber); text-shadow: 0 0 24px rgba(245,200,75,.35); }
+.mp-v-weak .mp-verdict-grade  { color: var(--red);   text-shadow: 0 0 24px rgba(255,77,90,.4); }
+.mp-v-solid { border-color: rgba(16,217,122,.3); }
+.mp-v-weak  { border-color: rgba(255,77,90,.32); }
+.mp-verdict-text { font-size: clamp(15px, 1.8vw, 18px); font-weight: 700; color: #eaf4ff; line-height: 1.5; }
+.mp-verdict-meta { margin-top: 8px; font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); }
+
+/* 卡片通用底 */
+.mp-stress-card, .mp-metric-card, .mp-moat-card, .mp-aux-card {
+  background: linear-gradient(180deg, rgba(10,22,40,.95), rgba(6,12,28,.97));
+  border: 1px solid var(--border); border-radius: 16px; padding: 22px;
+}
+
+/* 压力测试 */
+.mp-scen-tabs { display: flex; gap: 8px; margin-bottom: 18px; }
+.mp-scen-tab {
+  cursor: pointer; flex: 1; padding: 11px; font-family: var(--font-mono); font-size: 13px; font-weight: 700;
+  color: var(--text-3); background: #0a1426; border: 1px solid var(--border); border-radius: 10px;
+  transition: all .16s;
+}
+.mp-scen-tab:hover { color: var(--text); border-color: var(--border-strong); }
+.mp-scen-tab.active { color: #04121c; background: linear-gradient(135deg, #22d3ee, #6366f1); border-color: transparent; box-shadow: 0 4px 16px rgba(6,182,212,.3); }
+.mp-scen-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+.mp-scen-stat { text-align: center; padding: 16px 8px; background: #0a1426; border: 1px solid var(--border); border-radius: 12px; }
+.mp-scen-num { display: block; font-family: var(--font-mono); font-weight: 700; font-size: clamp(22px, 3vw, 30px); color: #dff1ff; line-height: 1; }
+.mp-scen-lbl { display: block; margin-top: 8px; font-size: 11px; color: var(--muted); }
+.mp-scen-breach { font-size: 13px; color: #ffd9c2; line-height: 1.7; padding: 14px 16px; background: rgba(255,77,90,.08); border: 1px solid rgba(255,77,90,.28); border-radius: 12px; }
+.mp-scen-breach b { color: var(--red); }
+.mp-breach-pill { display: inline-block; margin: 6px 6px 0 0; font-family: var(--font-mono); font-size: 11px; color: #ffc7bd; background: rgba(255,77,90,.12); border: 1px solid rgba(255,77,90,.3); border-radius: 20px; padding: 3px 10px; }
+.mp-scen-safe { font-size: 13px; color: #b8f0d0; line-height: 1.6; padding: 14px 16px; background: rgba(16,217,122,.08); border: 1px solid rgba(16,217,122,.26); border-radius: 12px; }
+
+/* 集中度 + 杠杆 */
+.mp-metrics-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.mp-metric-main { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; }
+.mp-metric-num { font-family: var(--font-mono); font-weight: 800; font-size: clamp(28px, 4vw, 38px); line-height: 1; }
+.conc-high, .lev-high { color: var(--red); }
+.conc-mid, .lev-mid { color: var(--amber); }
+.conc-low, .lev-low { color: var(--green); }
+.mp-metric-unit { font-size: 12px; color: var(--text-3); }
+.mp-metric-bars { display: flex; flex-direction: column; gap: 7px; margin-bottom: 14px; }
+.mp-conc-bar { position: relative; height: 22px; background: #0a1426; border-radius: 6px; overflow: hidden; }
+.mp-conc-fill { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, rgba(34,211,238,.5), rgba(99,102,241,.45)); border-radius: 6px; transition: width .6s var(--ease); }
+.mp-conc-tag { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-family: var(--font-mono); font-size: 11px; color: #eaf4ff; }
+.mp-metric-note { font-size: 12px; color: var(--text-3); line-height: 1.55; }
+.mp-metric-note b { color: #dff1ff; font-family: var(--font-mono); }
+.mp-lev-scale { margin-bottom: 14px; }
+.mp-lev-track { position: relative; height: 8px; background: linear-gradient(90deg, #10d97a, #f5c84b 40%, #ff4d5a); border-radius: 5px; }
+.mp-lev-marker { position: absolute; top: 50%; width: 14px; height: 14px; background: #fff; border: 2px solid #06121f; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 10px rgba(255,255,255,.5); transition: left .5s var(--ease); }
+.mp-lev-ticks { display: flex; justify-content: space-between; margin-top: 6px; font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
+
+/* 持仓护城河表 */
+.mp-moat-head, .mp-moat-row { display: grid; grid-template-columns: 1.6fr 54px 48px 70px 96px 110px; gap: 10px; align-items: center; }
+.mp-moat-head { padding: 0 4px 10px; border-bottom: 1px solid var(--border); font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); letter-spacing: .3px; }
+.mp-moat-head span:not(:first-child), .mp-moat-row > span:not(.mp-moat-sym) { text-align: right; }
+.mp-moat-list { display: flex; flex-direction: column; }
+.mp-moat-row { padding: 12px 4px; border-bottom: 1px solid rgba(255,255,255,.04); font-size: 12.5px; }
+.mp-moat-row:last-child { border-bottom: none; }
+.mp-moat-sym { font-family: var(--font-mono); font-weight: 800; color: #b8daff; display: flex; flex-direction: column; gap: 2px; }
+.mp-moat-sym em { font-style: normal; font-family: var(--font-sans); font-weight: 400; font-size: 11px; color: var(--text-3); }
+.mp-moat-w, .mp-moat-beta { font-family: var(--font-mono); color: var(--text-2); }
+.mp-moat-chg { font-family: var(--font-mono); font-weight: 700; }
+.mp-moat-cost, .mp-moat-breach { font-family: var(--font-mono); font-weight: 700; }
+.mp-moat-nocost { color: var(--muted); font-weight: 400; font-size: 11px; }
+.mp-tag-hedge { font-size: 10px; color: #8fd6ff; background: rgba(34,211,238,.12); border: 1px solid rgba(34,211,238,.3); border-radius: 20px; padding: 2px 8px; font-weight: 600; }
+.mp-moat-foot { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+/* 辅助：情绪因子 + 纪律分 */
+.mp-aux-row { display: grid; grid-template-columns: 1.15fr 1fr; gap: 16px; }
+.mp-emo { display: flex; align-items: center; gap: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+.mp-emo-num { font-family: var(--font-mono); font-weight: 800; font-size: 40px; line-height: 1; }
+.mp-emo-lbl { display: block; font-size: 11px; color: var(--muted); margin-top: 4px; }
+.mp-emo-vs { display: flex; flex-direction: column; gap: 6px; font-family: var(--font-mono); font-size: 13px; color: var(--text-3); }
+.mp-emo-advice { border-left: 3px solid var(--coral); padding-left: 14px; }
+.mp-emo-advice.mp-tone-high { border-left-color: var(--red); }
+.mp-emo-advice.mp-tone-mid { border-left-color: var(--amber); }
+.mp-emo-advice.mp-tone-calm { border-left-color: var(--green); }
+.mp-emo-advice p { font-size: 13px; line-height: 1.65; color: var(--text-2); margin-bottom: 12px; }
+.mp-disc-main { margin-bottom: 16px; }
+.mp-disc-num { font-family: var(--font-mono); font-weight: 800; font-size: 40px; color: var(--green); line-height: 1; }
+.mp-disc-lbl { display: block; font-size: 11px; color: var(--muted); margin-top: 6px; }
+.mp-disc-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
+.mp-disc-stats > div { padding: 12px 6px; background: #0a1426; border: 1px solid var(--border); border-radius: 10px; }
+.mp-disc-stats b { display: block; font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: #dff1ff; }
+.mp-disc-stats span { font-size: 10.5px; color: var(--muted); }
+.mp-disc-note { margin-top: 14px; font-size: 12px; color: var(--text-3); line-height: 1.55; }
+.mp-disc-empty p { font-size: 13px; color: var(--text-3); line-height: 1.7; }
+.mp-disc-empty b { color: #cfe9ff; }
 
 /* ── 持仓录入弹窗 ─────────────────────────────────────────── */
 .pf-overlay { position: fixed; inset: 0; z-index: 1200; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(1,4,9,.82); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); animation: ovFade .18s ease; }
@@ -2106,9 +2209,18 @@ html { scroll-behavior: smooth; scroll-padding-top: 72px; }
   .mp-top, .mp-bottom { grid-template-columns: 1fr; }
   .mp-score-card { flex-direction: column; gap: 16px; text-align: center; }
   .mp-score-vs { border-left: none; border-top: 1px solid var(--border); padding-left: 0; padding-top: 16px; width: 100%; }
+  .mp-metrics-row, .mp-aux-row { grid-template-columns: 1fr; }
+  .mp-verdict { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .mp-verdict-grade { padding-right: 0; padding-bottom: 12px; border-right: none; border-bottom: 1px solid var(--border); width: 100%; }
+}
+@media (max-width: 620px) {
+  .mp-moat-head { display: none; }
+  .mp-moat-row { grid-template-columns: 1fr auto auto; grid-auto-flow: row; gap: 6px 10px; }
+  .mp-moat-beta, .mp-moat-w { display: none; }
 }
 @media (max-width: 560px) {
   .pf-form { grid-template-columns: 1fr 1fr; }
   .mp-risk-row { grid-template-columns: 48px 1fr 60px; }
   .mp-risk-chg, .mp-risk-bar { display: none; }
+  .mp-scen-stats { grid-template-columns: 1fr; }
 }

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 
 const LINKS = [
-  { id: 'mypanic',  label: '我的恐慌' },
+  { id: 'mypanic',  label: '组合体检' },
   { id: 'overview', label: '市场总览' },
   { id: 'leaders',  label: '龙头股' },
   { id: 'risk',     label: '风险矩阵' },

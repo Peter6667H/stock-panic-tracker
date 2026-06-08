@@ -98,9 +98,9 @@ export default function App() {
 
       <main className="site-main">
         <Section
-          id="mypanic" num="01" eyebrow="个人化恐慌系数"
-          title="市场在慌，你该慌吗？"
-          sub="录入持仓，结合市场情绪 × 你的仓位风险 × 历史习惯，算出真正属于你的恐慌分。"
+          id="mypanic" num="01" eyebrow="组合体检 · 压力测试"
+          title="大盘跌 20%，你扛得住吗？"
+          sub="录入持仓，用各股 β 做压力测试：浮亏多少、哪只先破成本、有效杠杆与集中度——全是硬数字。"
         >
           <MyPanicSection
             quotes={quotes}

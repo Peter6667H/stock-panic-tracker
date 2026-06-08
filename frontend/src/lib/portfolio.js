@@ -110,6 +110,124 @@ export function computePersonal({ holdings, quotes, analytics, marketScore }) {
   }
 }
 
+// ── 组合体检引擎（硬指标：集中度 / 有效杠杆 / 压力测试 / 护城河）──
+// 给"老炮"看的是工程，不是情绪。所有数字源自真实头寸与各股 beta。
+const STRESS = [10, 20, 30] // 大盘下跌情景（%）
+
+export function computeHealth({ holdings, quotes, analytics, marketScore }) {
+  if (!holdings?.length || !quotes) return null
+
+  const rows = holdings.map(h => {
+    const q = quotes[h.sym] || {}
+    const a = analytics?.stocks?.[h.sym] || {}
+    const price = q.price ?? h.cost ?? 0
+    const value = price * (h.shares || 0)
+    const beta = (a.beta != null && isFinite(a.beta)) ? a.beta : 1
+    const hasCost = h.cost != null && h.cost > 0
+    return {
+      sym: h.sym, name: CN_NAMES[h.sym] || h.sym, shares: h.shares, cost: h.cost,
+      price, value, pct: q.pct ?? 0, beta, hasCost,
+    }
+  })
+  const total = rows.reduce((s, r) => s + r.value, 0) || 1
+
+  // ── 集中度：HHI、有效持仓数、头部权重 ──
+  const wsorted = rows.map(r => ({ sym: r.sym, name: r.name, w: r.value / total }))
+    .sort((a, b) => b.w - a.w)
+  const hhi = wsorted.reduce((s, x) => s + x.w * x.w, 0)
+  const effN = hhi > 0 ? 1 / hhi : rows.length
+  const top1 = wsorted[0]?.w ?? 0
+  const top3 = wsorted.slice(0, 3).reduce((s, x) => s + x.w, 0)
+  const concLevel = top1 >= 0.6 ? 'high' : top1 >= 0.4 ? 'mid' : 'low'
+
+  // ── 有效杠杆：加权 beta（含杠杆 ETF 自然放大）──
+  const portBeta = rows.reduce((s, r) => s + (r.value / total) * r.beta, 0)
+
+  // ── 压力测试：大盘跌 X% → 用 beta 折算个股跌幅 → 组合浮亏、击穿成本数 ──
+  const scenarios = STRESS.map(mDrop => {
+    let loss = 0
+    const breached = []
+    rows.forEach(r => {
+      const stockDrop = (r.beta * mDrop) / 100 // 可能为负（反向 ETF 对冲）
+      const posLoss = r.value * stockDrop
+      loss += posLoss
+      const newPrice = r.price * (1 - stockDrop)
+      if (r.hasCost && stockDrop > 0 && newPrice < r.cost) {
+        breached.push({ sym: r.sym, name: r.name, newPrice, cost: r.cost })
+      }
+    })
+    return {
+      drop: mDrop,
+      loss: Math.round(loss),
+      lossPct: +(loss / total * 100).toFixed(1),
+      remaining: Math.round(total - loss),
+      breached,
+    }
+  })
+
+  // ── 每仓护城河：距成本还能跌多少 + 大盘需跌多少才击穿 ──
+  const positions = rows.map(r => {
+    const toCostPct = (r.hasCost && r.price > 0)
+      ? Math.max(0, (r.price - r.cost) / r.price * 100)
+      : null
+    const hedge = r.beta < 0
+    const mktDropToBreach = (toCostPct != null && r.beta > 0)
+      ? Math.round(toCostPct / r.beta)
+      : null
+    const gainPct = r.hasCost ? Math.round((r.price - r.cost) / r.cost * 100) : null
+    return {
+      sym: r.sym, name: r.name,
+      weight: Math.round(r.value / total * 100),
+      value: Math.round(r.value), beta: +r.beta.toFixed(2),
+      pct: r.pct, gainPct, hasCost: r.hasCost, hedge,
+      toCostPct: toCostPct != null ? Math.round(toCostPct) : null,
+      mktDropToBreach,
+    }
+  }).sort((a, b) => b.value - a.value)
+
+  // ── 体检结论：以 -20% 情景的击穿情况定级 ──
+  const s20 = scenarios.find(s => s.drop === 20)
+  const s10 = scenarios.find(s => s.drop === 10)
+  let verdict
+  if (s10?.breached.length) {
+    verdict = { tone: 'weak', label: '脆弱', text: `大盘只要跌 10%，就有 ${s10.breached.length} 只持仓跌破成本。` }
+  } else if (s20?.breached.length) {
+    verdict = { tone: 'mid', label: '中等', text: `大盘跌 20% 时，${s20.breached.map(b => b.sym).join('、')} 会跌破成本，其余仍有安全垫。` }
+  } else {
+    verdict = { tone: 'solid', label: '抗揍', text: '即便大盘跌 20%，你的持仓全线仍在成本价之上。' }
+  }
+
+  const discipline = computeDiscipline()
+  const emotion = computePersonal({ holdings, quotes, analytics, marketScore })
+
+  return {
+    total: Math.round(total), count: rows.length,
+    concentration: {
+      hhi: +hhi.toFixed(3), effN: +effN.toFixed(1),
+      top1: Math.round(top1 * 100), top3: Math.round(top3 * 100),
+      level: concLevel, leader: wsorted[0],
+    },
+    portBeta: +portBeta.toFixed(2),
+    scenarios, positions, verdict, discipline, emotion,
+  }
+}
+
+// 纪律分：基于历史决策记录（持有 vs 割肉），新用户无数据
+export function computeDiscipline() {
+  const hist = getHistory().filter(h => h.decision)
+  if (!hist.length) return { hasData: false, total: 0 }
+  const total = hist.length
+  const held = hist.filter(h => h.decision === '持有').length
+  const sold = total - held
+  const panicDays = hist.filter(h => (h.market ?? 0) >= 55)
+  const panicSells = panicDays.filter(h => h.decision === '卖出').length
+  return {
+    hasData: true, total, held, sold,
+    holdRate: Math.round(held / total * 100),
+    panicDecisions: panicDays.length, panicSells,
+  }
+}
+
 // 镜子式应对建议（不构成投资建议）
 export function adviceFor(p) {
   if (!p) return null

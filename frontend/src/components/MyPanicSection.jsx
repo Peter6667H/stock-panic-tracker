@@ -1,12 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { getPanicLevel, fmtPrice } from '../lib/utils.js'
 import {
-  getHoldings, computePersonal, adviceFor, recordSnapshot,
+  getHoldings, computeHealth, adviceFor, recordSnapshot,
   getHistory, getCommitment, startCommitment, clearCommitment, logDecision,
 } from '../lib/portfolio.js'
-
-// 初期社区对标：预设档案（方案里写的初版用模拟数据）
-const COMMUNITY = { label: '科技股为主的投资者', avgPanic: 64, actRate: 27, n: '1.2k' }
 
 function hoursLeft(expiry) {
   const ms = expiry - Date.now()
@@ -16,165 +13,258 @@ function hoursLeft(expiry) {
 
 export default function MyPanicSection({ quotes, analytics, marketScore, holdingsVersion, onEdit }) {
   const holdings = getHoldings()
-  const p = useMemo(
-    () => computePersonal({ holdings, quotes, analytics, marketScore }),
+  const h = useMemo(
+    () => computeHealth({ holdings, quotes, analytics, marketScore }),
     [holdingsVersion, quotes, analytics, marketScore], // eslint-disable-line
   )
-  const advice = adviceFor(p)
+  const emo = h?.emotion
+  const advice = adviceFor(emo)
 
+  const [scenIdx, setScenIdx] = useState(1) // 默认看 -20% 情景
   const [commit, setCommit] = useState(getCommitment())
   const [, force] = useState(0)
 
-  // 记录每日快照（用于习惯修正与历史日记）
+  // 记录每日快照（用于纪律分与历史日记）
   useEffect(() => {
-    if (p?.personal != null) recordSnapshot(p.personal, p.market)
-  }, [p?.personal, p?.market])
+    if (emo?.personal != null) recordSnapshot(emo.personal, emo.market)
+  }, [emo?.personal, emo?.market])
 
   const expired = commit && Date.now() >= commit.expiry
   const active = commit && !expired
-
   const onCommit = () => { setCommit(startCommitment()) }
   const onDecision = d => { logDecision(d); clearCommitment(); setCommit(null); force(x => x + 1) }
 
-  // 空状态
-  if (!p) {
+  // ── 空状态 ──
+  if (!h) {
     return (
       <div className="mypanic">
         <div className="mp-empty">
           <div className="mp-empty-glow" aria-hidden />
-          <div className="mp-empty-eyebrow">// 个人化恐慌系数</div>
-          <h3 className="mp-empty-title">市场在慌，<span className="hero-title-accent">你</span>该慌吗？</h3>
+          <div className="mp-empty-eyebrow">// 组合体检 · PORTFOLIO STRESS TEST</div>
+          <h3 className="mp-empty-title">大盘跌 20%，<span className="hero-title-accent">你扛得住吗？</span></h3>
           <p className="mp-empty-sub">
-            市场恐慌指数只告诉你"大盘"的情绪。录入你的持仓，我们结合
-            <b> 市场情绪 × 你的仓位风险 × 你的历史习惯</b>，算出一个真正属于你的
-            <b> 个人恐慌分</b>——并在你最想割肉时，提醒你看看过去的自己。
+            恐慌指数只说"大盘"的情绪。录入持仓，我们用各股 <b>β 系数</b>做
+            <b> 压力测试</b>：大盘下挫时你浮亏多少、哪只先跌破成本、组合
+            <b> 有效杠杆</b>和<b> 集中度</b>有多高——全是硬数字，不灌鸡汤。
           </p>
-          <button className="mp-cta-btn" onClick={onEdit}>录入持仓，算出我的恐慌分 →</button>
+          <button className="mp-cta-btn" onClick={onEdit}>录入持仓，做一次组合体检 →</button>
           <div className="mp-empty-note">数据只存你本机浏览器 · 不上传 · 随时可删</div>
         </div>
       </div>
     )
   }
 
-  const level = getPanicLevel(p.personal)
-  const mLevel = getPanicLevel(p.market)
+  const { concentration: c, scenarios, positions, verdict, portBeta, discipline } = h
+  const scen = scenarios[scenIdx]
   const hist = getHistory().slice(-6).reverse()
-  const factors = [
-    { name: '市场情绪', val: p.market, w: '×0.35' },
-    { name: '持仓风险', val: p.positionRisk, w: '×0.40' },
-    { name: '习惯修正', val: p.habit, w: '×0.25' },
-  ]
+  const levBadge = portBeta >= 1.5 ? 'high' : portBeta >= 1.05 ? 'mid' : 'low'
 
   return (
     <div className="mypanic">
-      <div className="mp-top">
-        {/* 个人分 vs 市场分 */}
-        <div className="mp-score-card">
-          <span className="hud-corner tl" /><span className="hud-corner br" />
-          <div className="mp-score-main">
-            <div className="mp-score-label">你的个人恐慌分</div>
-            <div className="mp-score-num" style={{ color: level.color }}>{p.personal}</div>
-            <div className="mp-score-level" style={{ color: level.color }}>{level.label}</div>
-          </div>
-          <div className="mp-score-vs">
-            <div className="mp-vs-row">
-              <span>市场恐慌分</span>
-              <strong style={{ color: mLevel.color }}>{p.market}</strong>
-            </div>
-            <div className="mp-vs-delta">
-              {p.personal > p.market
-                ? <span className="negative">你比大盘更慌 +{p.personal - p.market}</span>
-                : p.personal < p.market
-                  ? <span className="positive">你比大盘更稳 {p.personal - p.market}</span>
-                  : <span className="neutral">与大盘同步</span>}
-            </div>
-            <div className="mp-vs-meta">组合 {fmtPrice(p.totalValue)} · {p.holdingsCount} 只持仓</div>
-          </div>
-        </div>
-
-        {/* 三因子构成 */}
-        <div className="mp-factors-card">
-          <div className="mp-card-title">恐慌分怎么来的</div>
-          {factors.map(f => (
-            <div key={f.name} className="mp-factor">
-              <span className="mp-factor-name">{f.name}<em>{f.w}</em></span>
-              <div className="mp-factor-bar"><div className="mp-factor-fill" style={{ width: `${f.val}%` }} /></div>
-              <span className="mp-factor-val">{f.val}</span>
-            </div>
-          ))}
-          <div className="mp-formula">个人 = 市场×0.35 + 持仓风险×0.40 + 习惯×0.25</div>
+      {/* ── 顶部：体检结论 ── */}
+      <div className={`mp-verdict mp-v-${verdict.tone}`}>
+        <span className="hud-corner tl" /><span className="hud-corner br" />
+        <div className="mp-verdict-grade">{verdict.label}</div>
+        <div className="mp-verdict-body">
+          <div className="mp-verdict-text">{verdict.text}</div>
+          <div className="mp-verdict-meta">组合市值 {fmtPrice(h.total)} · {h.count} 只持仓 · 有效杠杆 β {portBeta.toFixed(2)}</div>
         </div>
       </div>
 
-      {/* 持仓风险拆解 */}
-      <div className="mp-risk-card">
-        <div className="mp-card-title">谁在拖累你的情绪 <em>按今日恐慌贡献排序</em></div>
-        <div className="mp-risk-list">
-          {p.breakdown.map(b => (
-            <div key={b.sym} className="mp-risk-row">
-              <span className="mp-risk-sym">{b.sym}</span>
-              <span className="mp-risk-name">{b.name}</span>
-              <span className="mp-risk-weight">{b.weight}%仓</span>
-              {b.cushion > 0 && <span className="mp-risk-cushion" title={`浮盈 ${b.cushion}%，形成成本安全垫`}>🛡 {b.cushion}%</span>}
-              <span className={`mp-risk-chg ${b.pct >= 0 ? 'positive' : 'negative'}`}>{b.pct >= 0 ? '+' : ''}{b.pct.toFixed(2)}%</span>
-              <div className="mp-risk-bar"><div className="mp-risk-fill" style={{ width: `${Math.min(100, b.contrib * 1.4)}%` }} /></div>
-            </div>
+      {/* ── 压力测试矩阵（核心）── */}
+      <div className="mp-stress-card">
+        <div className="mp-card-title">压力测试 <em>大盘下跌时，你的组合会怎样（按各股 β 折算）</em></div>
+        <div className="mp-scen-tabs">
+          {scenarios.map((s, i) => (
+            <button key={s.drop}
+              className={`mp-scen-tab${i === scenIdx ? ' active' : ''}`}
+              onClick={() => setScenIdx(i)}>
+              大盘 −{s.drop}%
+            </button>
           ))}
         </div>
-      </div>
-
-      <div className="mp-bottom">
-        {/* 应对建议 + 48h 承诺 */}
-        <div className={`mp-advice mp-tone-${advice.tone}`}>
-          <div className="mp-advice-title">{advice.title}</div>
-          <p className="mp-advice-body">{advice.body}</p>
-
-          {expired ? (
-            <div className="mp-commit-expired">
-              <div className="mp-commit-q">你的 48 小时到了。当时你承诺等待——结果你怎么做了？</div>
-              <div className="mp-commit-btns">
-                <button className="mp-decide hold" onClick={() => onDecision('持有')}>我持住了</button>
-                <button className="mp-decide sell" onClick={() => onDecision('卖出')}>我卖了</button>
-              </div>
+        <div className="mp-scen-body">
+          <div className="mp-scen-stats">
+            <div className="mp-scen-stat">
+              <span className={`mp-scen-num ${scen.loss >= 0 ? 'negative' : 'positive'}`}>
+                {scen.loss >= 0 ? '−' : '+'}{fmtPrice(Math.abs(scen.loss))}
+              </span>
+              <span className="mp-scen-lbl">预计{scen.loss >= 0 ? '浮亏' : '浮盈'}（{Math.abs(scen.lossPct)}%）</span>
             </div>
-          ) : active ? (
-            <div className="mp-commit-active">
-              ⏸ 承诺生效中 · 还剩 <strong>{hoursLeft(commit.expiry)}</strong> 小时
-              <button className="mp-commit-cancel" onClick={() => { clearCommitment(); setCommit(null) }}>解除</button>
+            <div className="mp-scen-stat">
+              <span className="mp-scen-num">{fmtPrice(scen.remaining)}</span>
+              <span className="mp-scen-lbl">剩余市值</span>
+            </div>
+            <div className="mp-scen-stat">
+              <span className={`mp-scen-num ${scen.breached.length ? 'negative' : 'positive'}`}>{scen.breached.length}</span>
+              <span className="mp-scen-lbl">跌破成本的持仓</span>
+            </div>
+          </div>
+          {scen.breached.length > 0 ? (
+            <div className="mp-scen-breach">
+              ⚠ <b>{scen.breached.map(b => b.sym).join('、')}</b> 将跌破成本价
+              {scen.breached.map(b => (
+                <span key={b.sym} className="mp-breach-pill">{b.sym} {fmtPrice(b.newPrice)} ＜ 成本 {fmtPrice(b.cost)}</span>
+              ))}
             </div>
           ) : (
-            <button className="mp-advice-cta" onClick={advice.tone === 'high' ? onCommit : onEdit}>
-              {advice.cta}
-            </button>
+            <div className="mp-scen-safe">🛡 该情景下所有持仓仍在成本价之上 —— 这只是账面回吐，不是真亏。</div>
+          )}
+        </div>
+      </div>
+
+      {/* ── 集中度 + 杠杆 ── */}
+      <div className="mp-metrics-row">
+        <div className="mp-metric-card">
+          <div className="mp-card-title">集中度</div>
+          <div className="mp-metric-main">
+            <span className={`mp-metric-num conc-${c.level}`}>{c.top1}%</span>
+            <span className="mp-metric-unit">最大单仓 · {c.leader?.name}</span>
+          </div>
+          <div className="mp-metric-bars">
+            {positions.slice(0, 5).map(p => (
+              <div key={p.sym} className="mp-conc-bar" title={`${p.sym} ${p.weight}%`}>
+                <div className="mp-conc-fill" style={{ width: `${p.weight}%` }} />
+                <span className="mp-conc-tag">{p.sym} {p.weight}%</span>
+              </div>
+            ))}
+          </div>
+          <div className="mp-metric-note">
+            有效持仓数 <b>{c.effN}</b> 只
+            {c.level === 'high' ? ' · 单票主导，风险高度集中' : c.level === 'mid' ? ' · 偏集中' : ' · 相对分散'}
+          </div>
+        </div>
+
+        <div className="mp-metric-card">
+          <div className="mp-card-title">有效杠杆</div>
+          <div className="mp-metric-main">
+            <span className={`mp-metric-num lev-${levBadge}`}>β {portBeta.toFixed(2)}</span>
+            <span className="mp-metric-unit">组合对标普500的敏感度</span>
+          </div>
+          <div className="mp-lev-scale">
+            <div className="mp-lev-track">
+              <div className="mp-lev-marker" style={{ left: `${Math.min(100, portBeta / 3 * 100)}%` }} />
+            </div>
+            <div className="mp-lev-ticks"><span>0</span><span>1.0 大盘</span><span>3.0</span></div>
+          </div>
+          <div className="mp-metric-note">
+            {portBeta >= 1.5 ? '大盘每动 1%，你的组合约动 ' + portBeta.toFixed(1) + '% —— 杠杆偏高，双刃剑。'
+              : portBeta >= 1.05 ? '略高于大盘波动，进攻性温和。'
+                : '低于大盘波动，偏防守。'}
+          </div>
+        </div>
+      </div>
+
+      {/* ── 持仓护城河表 ── */}
+      <div className="mp-moat-card">
+        <div className="mp-card-title">持仓护城河 <em>每只股票距成本价的安全空间</em></div>
+        <div className="mp-moat-head">
+          <span>标的</span><span>仓位</span><span>β</span><span>今日</span><span>距成本</span><span>大盘跌多少击穿</span>
+        </div>
+        <div className="mp-moat-list">
+          {positions.map(p => (
+            <div key={p.sym} className="mp-moat-row">
+              <span className="mp-moat-sym">{p.sym}<em>{p.name}</em></span>
+              <span className="mp-moat-w">{p.weight}%</span>
+              <span className="mp-moat-beta">{p.beta}</span>
+              <span className={`mp-moat-chg ${p.pct >= 0 ? 'positive' : 'negative'}`}>{p.pct >= 0 ? '+' : ''}{p.pct.toFixed(2)}%</span>
+              <span className="mp-moat-cost">
+                {p.hedge ? <span className="mp-tag-hedge">反向对冲</span>
+                  : p.toCostPct == null ? <span className="mp-moat-nocost">未填成本</span>
+                    : <span className={p.toCostPct > 30 ? 'positive' : p.toCostPct > 10 ? 'neutral' : 'negative'}>还能跌 {p.toCostPct}%</span>}
+              </span>
+              <span className="mp-moat-breach">
+                {p.hedge ? '—'
+                  : p.mktDropToBreach == null ? '—'
+                    : <span className={p.mktDropToBreach >= 20 ? 'positive' : p.mktDropToBreach >= 8 ? 'neutral' : 'negative'}>−{p.mktDropToBreach}%</span>}
+              </span>
+            </div>
+          ))}
+        </div>
+        <div className="mp-moat-foot">"大盘跌多少击穿" = 距成本空间 ÷ β。数值越大越扛揍。填了成本价才有此列。</div>
+      </div>
+
+      {/* ── 辅助：情绪因子（降级）+ 纪律分 ── */}
+      <div className="mp-aux-row">
+        <div className="mp-aux-card">
+          <div className="mp-card-title">情绪因子 <em>仅供参考，非投资建议</em></div>
+          <div className="mp-emo">
+            <div className="mp-emo-score">
+              <span className="mp-emo-num" style={{ color: getPanicLevel(emo.personal).color }}>{emo.personal}</span>
+              <span className="mp-emo-lbl">情绪温度 / 100</span>
+            </div>
+            <div className="mp-emo-vs">
+              <span>大盘 {emo.market}</span>
+              <span className={emo.personal > emo.market ? 'negative' : 'positive'}>
+                {emo.personal > emo.market ? `你更紧张 +${emo.personal - emo.market}` : emo.personal < emo.market ? `你更稳 ${emo.personal - emo.market}` : '与大盘同步'}
+              </span>
+            </div>
+          </div>
+          {advice && (
+            <div className={`mp-emo-advice mp-tone-${advice.tone}`}>
+              <p>{advice.body}</p>
+              {expired ? (
+                <div className="mp-commit-expired">
+                  <div className="mp-commit-q">48 小时到了。当时你承诺等待——结果你怎么做了？</div>
+                  <div className="mp-commit-btns">
+                    <button className="mp-decide hold" onClick={() => onDecision('持有')}>我持住了</button>
+                    <button className="mp-decide sell" onClick={() => onDecision('卖出')}>我卖了</button>
+                  </div>
+                </div>
+              ) : active ? (
+                <div className="mp-commit-active">
+                  ⏸ 承诺生效中 · 还剩 <strong>{hoursLeft(commit.expiry)}</strong> 小时
+                  <button className="mp-commit-cancel" onClick={() => { clearCommitment(); setCommit(null) }}>解除</button>
+                </div>
+              ) : advice.tone === 'high' ? (
+                <button className="mp-advice-cta" onClick={onCommit}>{advice.cta}</button>
+              ) : null}
+            </div>
           )}
         </div>
 
-        {/* 社区对标 */}
-        <div className="mp-community">
-          <div className="mp-card-title">和你相似的投资者</div>
-          <div className="mp-comm-band">
-            <div className="mp-comm-item"><span>{COMMUNITY.label}</span><em>{COMMUNITY.n} 人</em></div>
-            <div className="mp-comm-stats">
-              <div><b>{COMMUNITY.avgPanic}</b><span>平均恐慌分</span></div>
-              <div><b>{COMMUNITY.actRate}%</b><span>今日出手率</span></div>
-              <div><b style={{ color: level.color }}>{p.personal}</b><span>你</span></div>
+        <div className="mp-aux-card">
+          <div className="mp-card-title">纪律分 <em>你说到做到了吗</em></div>
+          {discipline.hasData ? (
+            <div className="mp-disc">
+              <div className="mp-disc-main">
+                <span className="mp-disc-num">{discipline.holdRate}%</span>
+                <span className="mp-disc-lbl">决策中选择持有的比例</span>
+              </div>
+              <div className="mp-disc-stats">
+                <div><b>{discipline.total}</b><span>累计决策</span></div>
+                <div><b className="positive">{discipline.held}</b><span>持有</span></div>
+                <div><b className="negative">{discipline.sold}</b><span>卖出</span></div>
+              </div>
+              {discipline.panicDecisions > 0 && (
+                <div className="mp-disc-note">
+                  其中 {discipline.panicDecisions} 次发生在市场恐慌日，
+                  {discipline.panicSells > 0
+                    ? <b className="negative">{discipline.panicSells} 次恐慌中割肉</b>
+                    : <b className="positive">没有一次恐慌割肉</b>}。
+                </div>
+              )}
             </div>
-          </div>
-          <div className="mp-comm-note">初版为预设样本，真实社区聚合开发中。</div>
+          ) : (
+            <div className="mp-disc-empty">
+              <p>还没有决策记录。每当市场剧烈波动、你做出"持有/卖出"的选择，这里会自动累积，
+                30 天后给你一份<b> 操盘纪律报告</b>——多数人从没系统追踪过自己的决策质量。</p>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* 历史恐慌日记 */}
+      {/* ── 历史日记 ── */}
       {hist.length > 0 && (
         <div className="mp-history">
-          <div className="mp-card-title">你的恐慌日记 <em>每天自动记录</em></div>
+          <div className="mp-card-title">恐慌日记 <em>每天自动记录</em></div>
           <div className="mp-hist-list">
-            {hist.map(h => (
-              <div key={h.date} className="mp-hist-row">
-                <span className="mp-hist-date">{h.date.slice(5)}</span>
-                <span className="mp-hist-score">个人 <b>{h.personal}</b></span>
-                <span className="mp-hist-market">市场 {h.market}</span>
-                {h.decision && <span className={`mp-hist-decision ${h.decision === '持有' ? 'positive' : 'negative'}`}>{h.decision}</span>}
+            {hist.map(d => (
+              <div key={d.date} className="mp-hist-row">
+                <span className="mp-hist-date">{d.date.slice(5)}</span>
+                <span className="mp-hist-score">情绪 <b>{d.personal}</b></span>
+                <span className="mp-hist-market">市场 {d.market}</span>
+                {d.decision && <span className={`mp-hist-decision ${d.decision === '持有' ? 'positive' : 'negative'}`}>{d.decision}</span>}
               </div>
             ))}
           </div>
@@ -183,6 +273,7 @@ export default function MyPanicSection({ quotes, analytics, marketScore, holding
 
       <div className="mp-edit-row">
         <button className="mp-edit-btn" onClick={onEdit}>编辑持仓</button>
+        <span className="mp-edit-hint">填上成本价，护城河与击穿测算才完整。</span>
       </div>
     </div>
   )
