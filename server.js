@@ -466,6 +466,32 @@ app.get('/api/trump', async (req, res) => {
   }
 });
 
+// ── /api/sparks — 5-day hourly close prices for mini sparklines (5min cache) ──
+let sparksCache = null, sparksTime = 0;
+app.get('/api/sparks', async (req, res) => {
+  try {
+    if (sparksCache && Date.now() - sparksTime < 300_000) return res.json(sparksCache);
+    const results = await Promise.allSettled(ALL.map(async sym => {
+      const enc = encodeURIComponent(sym);
+      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${enc}?interval=1h&range=5d&includePrePost=false`;
+      const r = await fetch(url, { headers: HEADERS });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const d = await r.json();
+      const closes = d?.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
+      return { sym, closes: closes.filter(v => v != null).map(v => +v.toFixed(2)) };
+    }));
+    const sparks = {};
+    results.forEach(r => { if (r.status === 'fulfilled' && r.value.closes.length) sparks[r.value.sym] = r.value.closes; });
+    sparksCache = { sparks, ts: Date.now() };
+    sparksTime = Date.now();
+    res.json(sparksCache);
+  } catch (e) {
+    console.error('Sparks error:', e.message);
+    if (sparksCache) return res.json(sparksCache);
+    res.status(500).json({ error: e.message, sparks: {} });
+  }
+});
+
 // SPA fallback — all non-API GET requests serve index.html
 app.get('*', (req, res) => {
   res.sendFile(join(__dirname, 'dist', 'index.html'));

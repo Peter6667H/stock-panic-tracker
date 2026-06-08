@@ -1,6 +1,6 @@
 import StockCard from './StockCard.jsx'
 
-export default function StockSection({ title, icon, sub, id, syms, quotes, selectedSym, onSelectSym, bare }) {
+export default function StockSection({ title, icon, sub, id, syms, quotes, selectedSym, onSelectSym, bare, sparks }) {
   const grid = (
     <div className="stock-grid">
       {syms.map(sym => (
@@ -10,6 +10,7 @@ export default function StockSection({ title, icon, sub, id, syms, quotes, selec
           q={quotes[sym]}
           selected={selectedSym === sym}
           onSelect={onSelectSym}
+          sparkData={sparks?.[sym]}
         />
       ))}
     </div>

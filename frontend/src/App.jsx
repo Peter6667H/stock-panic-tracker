@@ -22,6 +22,7 @@ const jump = id => document.getElementById(id)?.scrollIntoView({ behavior: 'smoo
 export default function App() {
   const [quoteData, setQuoteData]       = useState(null)
   const [analyticsData, setAnalyticsData] = useState(null)
+  const [sparksData, setSparksData]     = useState(null)
   const [selectedSym, setSelectedSym]   = useState('AAPL')
   const [selectedPeriod, setSelectedPeriod] = useState('1y')
   const [marketState, setMarketState]   = useState('REGULAR')
@@ -50,13 +51,23 @@ export default function App() {
     } catch (e) { console.error('fetchAnalytics:', e) }
   }, [])
 
+  const fetchSparks = useCallback(async () => {
+    try {
+      const r = await fetch('/api/sparks')
+      const d = await r.json()
+      if (d.sparks) setSparksData(d.sparks)
+    } catch (e) { console.error('fetchSparks:', e) }
+  }, [])
+
   useEffect(() => {
     fetchQuotes()
     fetchAnalytics()
+    fetchSparks()
     const q = setInterval(fetchQuotes, 15_000)
     const a = setInterval(fetchAnalytics, 300_000)
-    return () => { clearInterval(q); clearInterval(a) }
-  }, [fetchQuotes, fetchAnalytics])
+    const s = setInterval(fetchSparks, 300_000)
+    return () => { clearInterval(q); clearInterval(a); clearInterval(s) }
+  }, [fetchQuotes, fetchAnalytics, fetchSparks])
 
   useEffect(() => {
     const onKey = e => {
@@ -127,11 +138,11 @@ export default function App() {
           sub="杠杆 ETF、科技七姐妹、半导体核心股。点任意一只，下方图表即时联动。"
         >
           <StockSection title="杠杆 ETF" sub="QQQ · TQQQ · SQQQ"
-            syms={SYMBOLS.etfs} quotes={quotes} selectedSym={selectedSym} onSelectSym={pickSym} bare />
+            syms={SYMBOLS.etfs} quotes={quotes} selectedSym={selectedSym} onSelectSym={pickSym} bare sparks={sparksData} />
           <StockSection title="科技七姐妹 · Mag 7" sub="七大科技龙头"
-            syms={SYMBOLS.mag7} quotes={quotes} selectedSym={selectedSym} onSelectSym={pickSym} bare />
+            syms={SYMBOLS.mag7} quotes={quotes} selectedSym={selectedSym} onSelectSym={pickSym} bare sparks={sparksData} />
           <StockSection title="半导体 / 科技股" sub="美光 · AMD · 英特尔"
-            syms={SYMBOLS.tech} quotes={quotes} selectedSym={selectedSym} onSelectSym={pickSym} bare />
+            syms={SYMBOLS.tech} quotes={quotes} selectedSym={selectedSym} onSelectSym={pickSym} bare sparks={sparksData} />
         </Section>
 
         <Section

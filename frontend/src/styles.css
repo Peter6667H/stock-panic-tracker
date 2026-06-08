@@ -2308,3 +2308,306 @@ html { scroll-behavior: smooth; scroll-padding-top: 72px; }
   .macro-tile { min-width: 120px; padding: 12px 14px; }
   .trump-header { flex-direction: column; align-items: flex-start; }
 }
+
+/* ════════════════════════════════════════════════════════════
+   moomoo 设计借鉴层
+   学习点：实心涨跌徽章 · Sparkline 走势线 · 行式布局 · 橙色强调
+   在现有 HUD 暗色基础上叠加，不破坏整体风格
+   ════════════════════════════════════════════════════════════ */
+
+/* ── 1. 橙色主题：以橙代青，保留 HUD 感 ── */
+:root {
+  --coral:        #f39800;
+  --coral-deep:   #e08500;
+  --coral-bright: #ffaa20;
+  --coral-soft:   rgba(243,152,0,.13);
+  --coral-grad:   linear-gradient(135deg, #f39800, #e06000);
+  --ai-purple:    #f97316;
+  --ai-purple-soft: rgba(249,115,22,.13);
+  --border-hover: #f39800;
+}
+
+/* 纯黑背景：moomoo 最标志性的极简背景 */
+body {
+  background: #000 !important;
+  background-image:
+    linear-gradient(rgba(243,152,0,.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(243,152,0,.018) 1px, transparent 1px),
+    radial-gradient(ellipse 70% 45% at 50% -10%, rgba(243,120,0,.08), transparent),
+    radial-gradient(ellipse 55% 35% at 88% 0%, rgba(249,115,22,.05), transparent) !important;
+}
+
+/* 扫描线改为极淡橙色 */
+body::after {
+  background: repeating-linear-gradient(
+    0deg, rgba(243,152,0,.015) 0 1px, transparent 1px 3px
+  ) !important;
+}
+/* 顶部扫掠光改橙色 */
+body::before {
+  background: linear-gradient(
+    180deg, transparent, rgba(243,152,0,.04) 45%, rgba(243,152,0,.06) 50%,
+    rgba(243,152,0,.04) 55%, transparent
+  ) !important;
+}
+
+/* 卡片/面板背景：纯黑而非蓝黑 */
+.gauge-card, .stat-card, .struct-card,
+.risk-table-wrap, .lev-card, .chart-section, .ai-insight-section,
+.search-panel, .ask-panel {
+  background: linear-gradient(180deg, #0d0d0d, #080808) !important;
+  border-color: #1c1c1c !important;
+}
+.stock-grid {
+  background: linear-gradient(180deg, #0d0d0d, #080808) !important;
+  border-color: #1c1c1c !important;
+}
+
+/* 导航栏：纯黑 */
+.site-nav { background: rgba(0,0,0,.2) !important; }
+.site-nav.scrolled {
+  background: rgba(0,0,0,.88) !important;
+  border-bottom-color: rgba(243,152,0,.18) !important;
+  box-shadow: 0 8px 30px rgba(0,0,0,.6) !important;
+}
+.nav-logo {
+  background: linear-gradient(135deg, rgba(243,152,0,.18), rgba(224,80,0,.12)) !important;
+  border-color: rgba(243,152,0,.35) !important;
+  box-shadow: 0 0 14px rgba(243,152,0,.3) !important;
+}
+.nav-wordmark-dim { color: var(--coral-bright) !important; }
+.nav-link:hover  { background: rgba(243,152,0,.07) !important; color: var(--text) !important; }
+.nav-link.active { color: var(--coral-bright) !important; }
+.nav-link.active::after {
+  background: var(--coral-bright) !important;
+  box-shadow: 0 0 8px rgba(243,152,0,.6) !important;
+}
+.nav-progress {
+  background: linear-gradient(90deg, #f39800, #ff6600) !important;
+  box-shadow: 0 0 10px rgba(243,152,0,.6) !important;
+}
+.nav-icon-btn:hover { border-color: var(--coral) !important; color: var(--coral-bright) !important; }
+.nav-cta {
+  background: linear-gradient(135deg, #f39800, #e06000) !important;
+  color: #000 !important;
+  box-shadow: 0 4px 18px rgba(243,152,0,.35) !important;
+}
+.nav-cta:hover { box-shadow: 0 8px 26px rgba(243,152,0,.5) !important; }
+
+/* Hero 橙色调 */
+.hero-eyebrow { color: var(--coral-bright) !important; text-shadow: 0 0 12px rgba(243,152,0,.4) !important; }
+.hero-title-accent {
+  background: linear-gradient(120deg, #f39800 0%, #ff6600 60%, #ff3300 100%) !important;
+  -webkit-background-clip: text !important; background-clip: text !important;
+}
+.hero-btn.primary {
+  background: linear-gradient(135deg, #f39800, #e06000) !important;
+  color: #000 !important;
+  box-shadow: 0 8px 28px rgba(243,152,0,.35) !important;
+}
+.hero-btn.primary:hover { box-shadow: 0 14px 38px rgba(243,152,0,.5) !important; }
+.hero-btn.ghost:hover { border-color: var(--coral) !important; color: var(--coral-bright) !important; }
+.hero-sub-em { color: var(--coral-bright) !important; }
+.hero-gauge-frame {
+  background: linear-gradient(180deg, rgba(20,12,0,.6), rgba(12,6,0,.5)) !important;
+  border-color: rgba(243,152,0,.3) !important;
+  box-shadow: 0 30px 80px rgba(0,0,0,.5), inset 0 0 60px rgba(243,152,0,.04) !important;
+}
+.hud-corner.tl, .hud-corner.tr, .hud-corner.bl, .hud-corner.br {
+  border-color: var(--coral-bright) !important;
+  filter: drop-shadow(0 0 4px rgba(243,152,0,.5)) !important;
+}
+.hero-scrollcue-line { background: linear-gradient(var(--coral-bright), transparent) !important; }
+.section-num { background: var(--coral-bright) !important; box-shadow: 0 0 14px rgba(243,152,0,.5) !important; }
+.section-eyebrow { color: var(--coral-bright) !important; }
+
+/* HUD 角框改橙色 */
+.gauge-card::before, .chart-section::before, .ai-insight-section::before,
+.risk-table-wrap::before, .stock-grid::before, .lev-card::before {
+  border-color: var(--coral-bright) !important;
+  filter: drop-shadow(0 0 3px rgba(243,152,0,.5)) !important;
+}
+.gauge-card::after, .chart-section::after, .ai-insight-section::after,
+.risk-table-wrap::after, .stock-grid::after, .lev-card::after {
+  border-color: var(--coral-bright) !important;
+  filter: drop-shadow(0 0 3px rgba(243,152,0,.5)) !important;
+}
+
+/* 恐慌分数橙辉光 */
+@keyframes hud-glow-breathe-orange {
+  0%,100% { text-shadow: 0 0 18px rgba(243,152,0,.4), 0 0 50px rgba(243,152,0,.12); }
+  50%      { text-shadow: 0 0 26px rgba(243,152,0,.7), 0 0 70px rgba(243,152,0,.25); }
+}
+.panic-score { animation: hud-glow-breathe-orange 3.5s ease-in-out infinite !important; }
+.clock { color: var(--coral-bright) !important; text-shadow: 0 0 8px rgba(243,152,0,.35) !important; }
+
+/* Flash 闪烁改橙色 */
+@keyframes hud-flash-orange { 0% { background-color: rgba(243,152,0,.2); } 100% { background-color: transparent; } }
+.hud-flash { animation: hud-flash-orange .9s ease-out !important; }
+
+/* 区块标题左边框橙色 */
+.section-title { border-left-color: var(--coral) !important; box-shadow: inset 0 -1px 0 rgba(243,152,0,.2), -4px 0 12px -6px rgba(243,152,0,.5) !important; }
+.section-title::before { color: var(--coral-bright) !important; text-shadow: 0 0 8px rgba(243,152,0,.6) !important; }
+.section-title::after { background: linear-gradient(90deg, transparent, var(--coral-bright), transparent) !important; }
+.card-title::before { color: var(--coral-bright) !important; text-shadow: 0 0 8px rgba(243,152,0,.6) !important; }
+.card-title::after { color: var(--coral-bright) !important; }
+.block-label::before { color: var(--coral-bright) !important; }
+
+/* hover 辉光改橙色 */
+.stock-card:hover {
+  background: rgba(243,152,0,.05) !important;
+  box-shadow: inset 0 0 0 1px rgba(243,152,0,.2), inset 2px 0 0 var(--coral-bright), 0 0 18px -4px rgba(243,152,0,.45) !important;
+}
+.stat-card.clickable:hover, .struct-card:hover {
+  box-shadow: 0 0 0 1px rgba(243,152,0,.25), 0 0 22px -6px rgba(243,152,0,.5) !important;
+}
+.risk-table tbody tr:hover {
+  background: rgba(243,152,0,.06) !important;
+  box-shadow: inset 2px 0 0 var(--coral-bright), inset 0 0 18px -6px rgba(243,152,0,.4) !important;
+}
+.risk-table tbody tr.selected {
+  background: rgba(243,152,0,.1) !important;
+  box-shadow: inset 3px 0 0 var(--coral) !important;
+}
+.period-btn.active {
+  background: rgba(243,152,0,.1) !important;
+  border-color: var(--coral) !important;
+  color: var(--coral) !important;
+  box-shadow: 0 0 10px rgba(243,152,0,.35) !important;
+}
+.ai-regime { background: rgba(243,152,0,.06) !important; border-color: rgba(243,152,0,.2) !important; }
+.ai-regime strong { text-shadow: 0 0 10px rgba(243,152,0,.45) !important; }
+.ai-inline-ask:hover { border-color: var(--coral) !important; color: var(--coral) !important; }
+
+/* 搜索/AI 面板 */
+.search-input-wrap .si-prompt { color: var(--coral) !important; text-shadow: 0 0 8px rgba(243,152,0,.6) !important; }
+.search-item.active { background: var(--coral-soft) !important; border-color: rgba(243,152,0,.35) !important; }
+.search-item.active .si-icon { background: var(--coral) !important; }
+.search-trigger:hover { border-color: var(--coral) !important; box-shadow: 0 0 0 2px rgba(243,152,0,.12) !important; }
+.search-panel::before, .ask-panel::before { border-color: var(--coral-bright) !important; }
+.ask-trigger, .ask-send, .ask-avatar { background: linear-gradient(135deg, #f39800, #e06000) !important; }
+.ask-msg.user .bubble { background: var(--coral) !important; }
+.ask-chip:hover { border-color: var(--coral) !important; color: var(--coral) !important; background: var(--coral-soft) !important; }
+.ask-typing span { background: var(--coral) !important; }
+
+/* 滚动条 */
+::-webkit-scrollbar-thumb { background: #1c1c1c !important; border-color: #000 !important; }
+::-webkit-scrollbar-thumb:hover { background: var(--coral) !important; }
+
+/* 大页脚橙色调 */
+.footer-brand span { color: var(--coral-bright) !important; }
+.footer-top { background: rgba(243,152,0,.08) !important; border-color: rgba(243,152,0,.3) !important; color: var(--coral-bright) !important; }
+.footer-top:hover { background: rgba(243,152,0,.16) !important; }
+
+/* ── 2. moomoo 行式股票卡片 ── */
+
+/* 在 .stock-block 里（龙头股区），采用 moomoo 行列格式 */
+.stock-block .stock-grid {
+  display: flex !important;
+  flex-direction: column !important;
+  background: linear-gradient(180deg, #0f0f0f, #090909) !important;
+  border: 1px solid #1e1e1e !important;
+  border-radius: 14px !important;
+  overflow: hidden !important;
+  gap: 0 !important;
+}
+.stock-block .stock-card {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 11px 16px !important;
+  border-radius: 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid #161616 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  min-height: 0 !important;
+  transition: background .14s !important;
+}
+.stock-block .stock-card:last-child { border-bottom: 0 !important; }
+/* 顶部颜色条 隐藏（moomoo 无此元素） */
+.stock-block .stock-card::before { display: none !important; }
+.stock-block .stock-card::after  { display: none !important; }
+.stock-block .stock-card:hover {
+  background: rgba(243,152,0,.06) !important;
+  box-shadow: inset 2px 0 0 var(--coral-bright) !important;
+  transform: none !important;
+}
+.stock-block .stock-card.selected {
+  background: rgba(243,152,0,.09) !important;
+  box-shadow: inset 3px 0 0 var(--coral) !important;
+}
+
+/* 左区：代码 + 名称纵向排列 */
+.mm-left { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.stock-block .card-sym {
+  font-family: var(--font-mono) !important;
+  font-size: 14px !important; font-weight: 800 !important;
+  color: #fff !important; display: block;
+}
+.stock-block .card-name {
+  font-size: 11px !important; color: #555 !important;
+  display: block; margin-bottom: 0 !important;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* 中区：Sparkline SVG */
+.mm-spark {
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 6px;
+}
+.mm-spark-svg { display: block; }
+.mm-spark-placeholder { width: 72px; height: 32px; }
+
+/* 右区：价格 + 实心徽章纵向排列 */
+.mm-right {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+  flex-shrink: 0;
+}
+.stock-block .card-price {
+  font-family: var(--font-mono) !important;
+  font-size: 15px !important; font-weight: 700 !important;
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 3. moomoo 实心涨跌徽章 ── */
+.mm-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 700; letter-spacing: .2px;
+  padding: 2px 9px; border-radius: 4px;
+  color: #fff; text-align: center;
+  white-space: nowrap; min-width: 64px;
+  font-variant-numeric: tabular-nums;
+}
+.mm-badge-up { background: var(--green); }
+.mm-badge-dn { background: var(--red); }
+
+/* 普通 stock-card（非 stock-block，如旧密集列表）也加徽章 */
+.stock-card .mm-right { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+.stock-card .mm-left  { display: flex; flex-direction: column; }
+
+/* ── 旧 card-chg 隐藏（用 mm-badge 替代）── */
+.stock-block .card-chg { display: none !important; }
+.stock-block .card-footer { display: none !important; }
+
+/* ── 4. mp 组合体检区块同步橙色调 ── */
+.mp-empty { border-color: rgba(243,152,0,.22) !important; }
+.mp-empty-glow {
+  background: radial-gradient(50% 60% at 50% 0%, rgba(243,152,0,.18), transparent 70%),
+              radial-gradient(40% 50% at 70% 10%, rgba(249,115,22,.14), transparent 70%) !important;
+}
+.mp-empty-eyebrow { color: var(--coral-bright) !important; }
+.mp-cta-btn {
+  background: linear-gradient(135deg, #f39800, #e06000) !important;
+  color: #000 !important;
+  box-shadow: 0 10px 32px rgba(243,152,0,.34) !important;
+}
+.mp-cta-btn:hover { box-shadow: 0 16px 42px rgba(243,152,0,.5) !important; }
+
+/* Trump tab 橙色 active */
+.trump-tab.active { background: linear-gradient(135deg, #f39800, #e06000) !important; color: #000 !important; }
+
