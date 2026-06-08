@@ -2611,3 +2611,86 @@ body::before {
 /* Trump tab 橙色 active */
 .trump-tab.active { background: linear-gradient(135deg, #f39800, #e06000) !important; color: #000 !important; }
 
+/* ════════════════════════════════════════════════════════════
+   密集化层 — 收紧间距，提升信息密度（moomoo 风格的紧凑感）
+   从「营销落地页」大留白 → 「看盘工具」高密度
+   ════════════════════════════════════════════════════════════ */
+
+/* ── Hero 不再独占整屏，数据更早可见 ── */
+.hero { min-height: 86vh; padding: 78px 28px 38px; }
+.hero-inner { gap: 40px; }
+.hero-sub { margin-bottom: 26px; }
+.hero-actions { gap: 12px; }
+
+/* ── 区块上下留白：92px → 40px（最大收益） ── */
+.site-section { padding: 40px 0; }
+.reveal { transform: translateY(16px); transition: opacity .55s var(--ease), transform .55s var(--ease); }
+
+/* ── 区块标题区：紧凑 ── */
+.section-head { margin-bottom: 20px; }
+.section-meta { gap: 9px; margin-bottom: 9px; }
+.section-eyebrow { font-size: 11px; letter-spacing: 1.6px; }
+.section-h { font-size: clamp(20px, 2.3vw, 29px); line-height: 1.15; }
+.section-desc { font-size: clamp(12.5px, 1vw, 14px); line-height: 1.55; margin-top: 9px; max-width: 44em; }
+
+/* ── 子块标签 / 间距 ── */
+.block-label { margin: 0 0 9px; font-size: 12px; }
+.stock-block { margin-bottom: 16px; }
+
+/* ── 龙头股：行更矮更紧 ── */
+.stock-block .stock-card { padding: 8px 14px !important; }
+.stock-block .card-sym { font-size: 13.5px !important; }
+.stock-block .card-name { font-size: 10.5px !important; }
+.stock-block .card-price { font-size: 14px !important; }
+.mm-spark-svg, .mm-spark-placeholder { height: 28px !important; }
+
+/* ── 市场结构四卡片：缩紧 ── */
+.struct-block .structure-grid { gap: 9px; }
+.struct-block .struct-card { padding: 13px 15px; border-radius: 11px; }
+.struct-block .struct-card:hover { transform: none; }
+.struct-block .struct-main { font-size: 23px; margin-top: 2px; }
+
+/* ── 风险表 / 杠杆 ── */
+.site-section .risk-table thead th { padding: 10px 13px; }
+.site-section .risk-table tbody td { padding: 9px 13px; }
+.lev-block { margin-top: 16px; }
+.lev-block .leverage-grid { gap: 10px; }
+.lev-block .lev-card { padding: 17px 18px; border-radius: 12px; }
+
+/* ── 图表区：略收 ── */
+.site-section .chart-section { padding: 18px; border-radius: 13px; }
+.site-section .chart-container { height: 380px; }
+.site-section .rsi-container { height: 96px; }
+
+/* ── 宏观指标：瓦片更密 ── */
+.macro-wrap { gap: 12px; }
+.macro-group { gap: 7px; }
+.macro-tiles { gap: 8px; }
+.macro-tile { padding: 11px 13px !important; }
+.macro-footer { margin-top: 4px; }
+
+/* ── Trump feed：更紧 ── */
+.trump-wrap { margin-top: 16px; }
+.trump-feed { gap: 7px; }
+.trump-post { padding: 12px 14px; }
+.trump-post-meta { margin-bottom: 7px; }
+.trump-post-foot { margin-top: 9px; }
+
+/* ── 组合体检：缩紧 ── */
+.mypanic { gap: 11px; }
+.mp-metrics-row { gap: 11px; }
+.mp-aux-row { gap: 11px; }
+.mp-moat-row { padding: 9px 4px; }
+.mp-moat-foot { margin-top: 10px; padding-top: 9px; }
+
+/* ── 响应式：进一步收紧 ── */
+@media (max-width: 920px) {
+  .site-section { padding: 32px 0; }
+  .section-head { margin-bottom: 16px; }
+}
+@media (max-width: 560px) {
+  .site-section { padding: 26px 0; }
+  .hero { min-height: auto; padding: 72px 16px 34px; }
+  .site-section .chart-container { height: 300px; }
+}
+
