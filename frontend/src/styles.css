@@ -2700,3 +2700,142 @@ body::before {
   .site-section .chart-container { height: 300px; }
 }
 
+/* ════════════════════════════════════════════════════════════
+   消除 AI 味 — 纯黑底色 · 清除残留蓝紫 · 终端模块标题
+   ════════════════════════════════════════════════════════════ */
+
+/* 纯黑背景：彻底移除格子图案（格子背景是 AI Dashboard 的标志符号） */
+body {
+  background: #000 !important;
+  background-image: none !important;
+}
+
+/* ── 残留蓝紫渐变按钮 → 橙色 ── */
+.mp-advice-cta,
+.mp-scen-tab.active,
+.pf-btn.primary {
+  background: linear-gradient(135deg, #f39800, #d46000) !important;
+  color: #000 !important;
+  border-color: transparent !important;
+  box-shadow: 0 6px 20px rgba(243,152,0,.3) !important;
+}
+.mp-advice-cta:hover { box-shadow: 0 10px 28px rgba(243,152,0,.48) !important; }
+.pf-btn.primary:not(:disabled):hover { filter: brightness(1.1) !important; }
+
+/* 因子与集中度填充条 → 橙色 */
+.mp-factor-fill { background: linear-gradient(90deg, #f39800, #d46000) !important; }
+.mp-conc-fill   { background: linear-gradient(90deg, rgba(243,152,0,.5), rgba(212,96,0,.4)) !important; }
+
+/* ── 残留海军蓝背景 → 纯黑 ── */
+.pf-overlay { background: rgba(0,0,0,.88) !important; }
+.pf-modal   { background: #0a0a0a !important; border-color: #222 !important; }
+.pf-input   { background: #111 !important; border-color: #1c1c1c !important; }
+.pf-row     { background: #111 !important; border-color: #1c1c1c !important; }
+.pf-add {
+  color: var(--coral-bright) !important;
+  background: rgba(243,152,0,.1) !important;
+  border: 1px solid rgba(243,152,0,.32) !important;
+}
+.pf-add:hover { background: rgba(243,152,0,.18) !important; }
+
+.mp-scen-tab:not(.active) {
+  background: #111 !important;
+  border-color: #1c1c1c !important;
+  color: var(--text-3) !important;
+}
+.mp-scen-stat,
+.mp-comm-stats > div,
+.mp-hist-row,
+.mp-disc-stats > div {
+  background: #111 !important;
+  border-color: #1c1c1c !important;
+}
+.mp-factor-bar,
+.mp-risk-bar,
+.mp-conc-bar { background: #161616 !important; }
+.mp-scen-stat b,
+.mp-comm-stats b,
+.mp-disc-stats b { color: #e8e8e8 !important; }
+
+.macro-tile {
+  background: linear-gradient(180deg, #0d0d0d, #0a0a0a) !important;
+  border-color: #1a1a1a !important;
+}
+.trump-post { background: #0d0d0d !important; border-color: #1a1a1a !important; }
+.trump-tab:not(.active) { background: #111 !important; border-color: #1c1c1c !important; }
+.mp-tag-hedge {
+  color: var(--coral-bright) !important;
+  background: rgba(243,152,0,.1) !important;
+  border-color: rgba(243,152,0,.28) !important;
+}
+
+/* ── 区块标题：从 AI 营销大标题 → 终端模块标题栏 ── */
+.section-head { margin-bottom: 22px !important; }
+
+.section-meta {
+  position: relative;
+  display: flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+  margin-bottom: 10px !important;
+  padding-bottom: 9px !important;
+  border-bottom: 1px solid #1a1a1a !important;
+}
+
+/* 区块编号：从实心橙色胶囊 → 极细描边标签 */
+.section-num {
+  font-family: var(--font-mono) !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  padding: 1px 6px !important;
+  background: rgba(243,152,0,.08) !important;
+  color: var(--coral-bright) !important;
+  border: 1px solid rgba(243,152,0,.25) !important;
+  border-radius: 3px !important;
+  box-shadow: none !important;
+}
+
+/* 眉题（eyebrow）：保持终端感，稍降饱和 */
+.section-eyebrow {
+  font-family: var(--font-mono) !important;
+  font-size: 10.5px !important;
+  letter-spacing: 1.4px !important;
+  color: #888 !important;
+  text-transform: uppercase !important;
+}
+
+/* meta 行末：一条向右渐隐的橙线 */
+.section-meta::after {
+  content: '';
+  position: absolute;
+  right: 0; bottom: -1px;
+  width: 55%;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(243,152,0,.35), transparent);
+  pointer-events: none;
+}
+
+/* 标题字：从 44px 营销体 → 20px 终端模块名 */
+.section-h {
+  font-family: var(--font-sans) !important;
+  font-size: clamp(16px, 1.7vw, 21px) !important;
+  font-weight: 800 !important;
+  color: #d8d8d8 !important;
+  letter-spacing: -.2px !important;
+  line-height: 1.3 !important;
+}
+
+/* 副文字：更小更暗，退到背景 */
+.section-desc {
+  font-size: 12px !important;
+  color: #555 !important;
+  margin-top: 6px !important;
+  line-height: 1.6 !important;
+}
+
+/* 站点分隔线：从蓝色调到纯黑调 */
+.site-section + .site-section { border-top-color: #161616 !important; }
+
+/* 大页脚：收紧 */
+.footer-inner { padding: 44px 28px 52px !important; }
+
