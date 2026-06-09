@@ -27,8 +27,7 @@ export default function Terminal({
 
   return (
     <section id="terminal" className="terminal">
-
-      {/* ① 顶部数据条：恐慌分 + 关键指数 */}
+      {/* 市场状态条：恐慌分 + 指数 */}
       <div className="tm-strip">
         <div className="tm-panic" style={{ '--lvl': level.color }}>
           <span className="tm-panic-lbl">恐慌指数</span>
@@ -39,25 +38,15 @@ export default function Terminal({
           <Ticker sym="^IXIC" q={quotes['^IXIC']} onClick={() => onSelectSym('^IXIC')} />
           <Ticker sym="^GSPC" q={quotes['^GSPC']} onClick={() => onSelectSym('^GSPC')} />
           <Ticker sym="^VIX"  q={quotes['^VIX']}  onClick={() => onSelectSym('^VIX')} />
-          <Ticker sym="QQQ"   q={quotes['QQQ']}   onClick={() => onSelectSym('QQQ')} />
-          <Ticker sym="TQQQ"  q={quotes['TQQQ']}  onClick={() => onSelectSym('TQQQ')} />
         </div>
       </div>
 
-      {/* ② 自选横条：水平滚动 ticker strip */}
-      <div className="tm-watchstrip-outer">
-        <Watchlist
-          quotes={quotes}
-          selectedSym={selectedSym}
-          onSelect={onSelectSym}
-          onContext={onContextStock}
-          mode="strip"
-        />
-      </div>
-
-      {/* ③ 主区：全宽大图 */}
-      <div className="tm-main-area">
-        <div className="tm-chart-panel">
+      {/* 三栏：自选 | K线 | 个股详情 */}
+      <div className="tm-grid">
+        <div className="tm-left">
+          <Watchlist quotes={quotes} selectedSym={selectedSym} onSelect={onSelectSym} onContext={onContextStock} />
+        </div>
+        <div className="tm-center">
           <ChartSection
             selectedSym={selectedSym}
             selectedPeriod={selectedPeriod}
@@ -66,16 +55,13 @@ export default function Terminal({
             analyticsData={analyticsData}
           />
         </div>
-      </div>
-
-      {/* ④ 底部网格：个股详情 + 3 排行榜 */}
-      <div className="tm-bottom-grid">
-        <div className="tm-bottom-card tm-detail-card">
+        <div className="tm-right">
           <StockDetail sym={selectedSym} quote={selQuote} analytics={analyticsData} onAskAI={onAskAI} />
         </div>
-        <RankingTables quotes={quotes} selectedSym={selectedSym} onSelect={onSelectSym} onContext={onContextStock} />
       </div>
 
+      {/* 底部排行榜 */}
+      <RankingTables quotes={quotes} selectedSym={selectedSym} onSelect={onSelectSym} onContext={onContextStock} />
     </section>
   )
 }
