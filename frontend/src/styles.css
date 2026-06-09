@@ -2327,22 +2327,22 @@ html { scroll-behavior: smooth; scroll-padding-top: 72px; }
 
 /* ── 1. 橙色主题：以橙代青，保留 HUD 感 ── */
 :root {
-  --coral:        #f39800;
+  --coral:        #2563eb;
   --coral-deep:   #e08500;
   --coral-bright: #ffaa20;
-  --coral-soft:   rgba(243,152,0,.13);
-  --coral-grad:   linear-gradient(135deg, #f39800, #e06000);
+  --coral-soft:   rgba(37,99,235,.13);
+  --coral-grad:   linear-gradient(135deg, #2563eb, #1d4ed8);
   --ai-purple:    #f97316;
   --ai-purple-soft: rgba(249,115,22,.13);
-  --border-hover: #f39800;
+  --border-hover: #2563eb;
 }
 
 /* 纯黑背景：moomoo 最标志性的极简背景 */
 body {
   background: #000 !important;
   background-image:
-    linear-gradient(rgba(243,152,0,.018) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(243,152,0,.018) 1px, transparent 1px),
+    linear-gradient(rgba(37,99,235,.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37,99,235,.018) 1px, transparent 1px),
     radial-gradient(ellipse 70% 45% at 50% -10%, rgba(243,120,0,.08), transparent),
     radial-gradient(ellipse 55% 35% at 88% 0%, rgba(249,115,22,.05), transparent) !important;
 }
@@ -2350,14 +2350,14 @@ body {
 /* 扫描线改为极淡橙色 */
 body::after {
   background: repeating-linear-gradient(
-    0deg, rgba(243,152,0,.015) 0 1px, transparent 1px 3px
+    0deg, rgba(37,99,235,.015) 0 1px, transparent 1px 3px
   ) !important;
 }
 /* 顶部扫掠光改橙色 */
 body::before {
   background: linear-gradient(
-    180deg, transparent, rgba(243,152,0,.04) 45%, rgba(243,152,0,.06) 50%,
-    rgba(243,152,0,.04) 55%, transparent
+    180deg, transparent, rgba(37,99,235,.04) 45%, rgba(37,99,235,.06) 50%,
+    rgba(37,99,235,.04) 55%, transparent
   ) !important;
 }
 
@@ -2377,125 +2377,125 @@ body::before {
 .site-nav { background: rgba(0,0,0,.2) !important; }
 .site-nav.scrolled {
   background: rgba(0,0,0,.88) !important;
-  border-bottom-color: rgba(243,152,0,.18) !important;
+  border-bottom-color: rgba(37,99,235,.18) !important;
   box-shadow: 0 8px 30px rgba(0,0,0,.6) !important;
 }
 .nav-logo {
-  background: linear-gradient(135deg, rgba(243,152,0,.18), rgba(224,80,0,.12)) !important;
-  border-color: rgba(243,152,0,.35) !important;
-  box-shadow: 0 0 14px rgba(243,152,0,.3) !important;
+  background: linear-gradient(135deg, rgba(37,99,235,.18), rgba(29,78,216,.12)) !important;
+  border-color: rgba(37,99,235,.35) !important;
+  box-shadow: 0 0 14px rgba(37,99,235,.3) !important;
 }
 .nav-wordmark-dim { color: var(--coral-bright) !important; }
-.nav-link:hover  { background: rgba(243,152,0,.07) !important; color: var(--text) !important; }
+.nav-link:hover  { background: rgba(37,99,235,.07) !important; color: var(--text) !important; }
 .nav-link.active { color: var(--coral-bright) !important; }
 .nav-link.active::after {
   background: var(--coral-bright) !important;
-  box-shadow: 0 0 8px rgba(243,152,0,.6) !important;
+  box-shadow: 0 0 8px rgba(37,99,235,.6) !important;
 }
 .nav-progress {
-  background: linear-gradient(90deg, #f39800, #ff6600) !important;
-  box-shadow: 0 0 10px rgba(243,152,0,.6) !important;
+  background: linear-gradient(90deg, #2563eb, #60a5fa) !important;
+  box-shadow: 0 0 10px rgba(37,99,235,.6) !important;
 }
 .nav-icon-btn:hover { border-color: var(--coral) !important; color: var(--coral-bright) !important; }
 .nav-cta {
-  background: linear-gradient(135deg, #f39800, #e06000) !important;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
   color: #000 !important;
-  box-shadow: 0 4px 18px rgba(243,152,0,.35) !important;
+  box-shadow: 0 4px 18px rgba(37,99,235,.35) !important;
 }
-.nav-cta:hover { box-shadow: 0 8px 26px rgba(243,152,0,.5) !important; }
+.nav-cta:hover { box-shadow: 0 8px 26px rgba(37,99,235,.5) !important; }
 
 /* Hero 橙色调 */
-.hero-eyebrow { color: var(--coral-bright) !important; text-shadow: 0 0 12px rgba(243,152,0,.4) !important; }
+.hero-eyebrow { color: var(--coral-bright) !important; text-shadow: 0 0 12px rgba(37,99,235,.4) !important; }
 .hero-title-accent {
-  background: linear-gradient(120deg, #f39800 0%, #ff6600 60%, #ff3300 100%) !important;
+  background: linear-gradient(120deg, #60a5fa 0%, #2563eb 60%, #1d4ed8 100%) !important;
   -webkit-background-clip: text !important; background-clip: text !important;
 }
 .hero-btn.primary {
-  background: linear-gradient(135deg, #f39800, #e06000) !important;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
   color: #000 !important;
-  box-shadow: 0 8px 28px rgba(243,152,0,.35) !important;
+  box-shadow: 0 8px 28px rgba(37,99,235,.35) !important;
 }
-.hero-btn.primary:hover { box-shadow: 0 14px 38px rgba(243,152,0,.5) !important; }
+.hero-btn.primary:hover { box-shadow: 0 14px 38px rgba(37,99,235,.5) !important; }
 .hero-btn.ghost:hover { border-color: var(--coral) !important; color: var(--coral-bright) !important; }
 .hero-sub-em { color: var(--coral-bright) !important; }
 .hero-gauge-frame {
   background: linear-gradient(180deg, rgba(20,12,0,.6), rgba(12,6,0,.5)) !important;
-  border-color: rgba(243,152,0,.3) !important;
-  box-shadow: 0 30px 80px rgba(0,0,0,.5), inset 0 0 60px rgba(243,152,0,.04) !important;
+  border-color: rgba(37,99,235,.3) !important;
+  box-shadow: 0 30px 80px rgba(0,0,0,.5), inset 0 0 60px rgba(37,99,235,.04) !important;
 }
 .hud-corner.tl, .hud-corner.tr, .hud-corner.bl, .hud-corner.br {
   border-color: var(--coral-bright) !important;
-  filter: drop-shadow(0 0 4px rgba(243,152,0,.5)) !important;
+  filter: drop-shadow(0 0 4px rgba(37,99,235,.5)) !important;
 }
 .hero-scrollcue-line { background: linear-gradient(var(--coral-bright), transparent) !important; }
-.section-num { background: var(--coral-bright) !important; box-shadow: 0 0 14px rgba(243,152,0,.5) !important; }
+.section-num { background: var(--coral-bright) !important; box-shadow: 0 0 14px rgba(37,99,235,.5) !important; }
 .section-eyebrow { color: var(--coral-bright) !important; }
 
 /* HUD 角框改橙色 */
 .gauge-card::before, .chart-section::before, .ai-insight-section::before,
 .risk-table-wrap::before, .stock-grid::before, .lev-card::before {
   border-color: var(--coral-bright) !important;
-  filter: drop-shadow(0 0 3px rgba(243,152,0,.5)) !important;
+  filter: drop-shadow(0 0 3px rgba(37,99,235,.5)) !important;
 }
 .gauge-card::after, .chart-section::after, .ai-insight-section::after,
 .risk-table-wrap::after, .stock-grid::after, .lev-card::after {
   border-color: var(--coral-bright) !important;
-  filter: drop-shadow(0 0 3px rgba(243,152,0,.5)) !important;
+  filter: drop-shadow(0 0 3px rgba(37,99,235,.5)) !important;
 }
 
 /* 恐慌分数橙辉光 */
 @keyframes hud-glow-breathe-orange {
-  0%,100% { text-shadow: 0 0 18px rgba(243,152,0,.4), 0 0 50px rgba(243,152,0,.12); }
-  50%      { text-shadow: 0 0 26px rgba(243,152,0,.7), 0 0 70px rgba(243,152,0,.25); }
+  0%,100% { text-shadow: 0 0 18px rgba(37,99,235,.4), 0 0 50px rgba(37,99,235,.12); }
+  50%      { text-shadow: 0 0 26px rgba(37,99,235,.7), 0 0 70px rgba(37,99,235,.25); }
 }
 .panic-score { animation: hud-glow-breathe-orange 3.5s ease-in-out infinite !important; }
-.clock { color: var(--coral-bright) !important; text-shadow: 0 0 8px rgba(243,152,0,.35) !important; }
+.clock { color: var(--coral-bright) !important; text-shadow: 0 0 8px rgba(37,99,235,.35) !important; }
 
 /* Flash 闪烁改橙色 */
-@keyframes hud-flash-orange { 0% { background-color: rgba(243,152,0,.2); } 100% { background-color: transparent; } }
+@keyframes hud-flash-orange { 0% { background-color: rgba(37,99,235,.2); } 100% { background-color: transparent; } }
 .hud-flash { animation: hud-flash-orange .9s ease-out !important; }
 
 /* 区块标题左边框橙色 */
-.section-title { border-left-color: var(--coral) !important; box-shadow: inset 0 -1px 0 rgba(243,152,0,.2), -4px 0 12px -6px rgba(243,152,0,.5) !important; }
-.section-title::before { color: var(--coral-bright) !important; text-shadow: 0 0 8px rgba(243,152,0,.6) !important; }
+.section-title { border-left-color: var(--coral) !important; box-shadow: inset 0 -1px 0 rgba(37,99,235,.2), -4px 0 12px -6px rgba(37,99,235,.5) !important; }
+.section-title::before { color: var(--coral-bright) !important; text-shadow: 0 0 8px rgba(37,99,235,.6) !important; }
 .section-title::after { background: linear-gradient(90deg, transparent, var(--coral-bright), transparent) !important; }
-.card-title::before { color: var(--coral-bright) !important; text-shadow: 0 0 8px rgba(243,152,0,.6) !important; }
+.card-title::before { color: var(--coral-bright) !important; text-shadow: 0 0 8px rgba(37,99,235,.6) !important; }
 .card-title::after { color: var(--coral-bright) !important; }
 .block-label::before { color: var(--coral-bright) !important; }
 
 /* hover 辉光改橙色 */
 .stock-card:hover {
-  background: rgba(243,152,0,.05) !important;
-  box-shadow: inset 0 0 0 1px rgba(243,152,0,.2), inset 2px 0 0 var(--coral-bright), 0 0 18px -4px rgba(243,152,0,.45) !important;
+  background: rgba(37,99,235,.05) !important;
+  box-shadow: inset 0 0 0 1px rgba(37,99,235,.2), inset 2px 0 0 var(--coral-bright), 0 0 18px -4px rgba(37,99,235,.45) !important;
 }
 .stat-card.clickable:hover, .struct-card:hover {
-  box-shadow: 0 0 0 1px rgba(243,152,0,.25), 0 0 22px -6px rgba(243,152,0,.5) !important;
+  box-shadow: 0 0 0 1px rgba(37,99,235,.25), 0 0 22px -6px rgba(37,99,235,.5) !important;
 }
 .risk-table tbody tr:hover {
-  background: rgba(243,152,0,.06) !important;
-  box-shadow: inset 2px 0 0 var(--coral-bright), inset 0 0 18px -6px rgba(243,152,0,.4) !important;
+  background: rgba(37,99,235,.06) !important;
+  box-shadow: inset 2px 0 0 var(--coral-bright), inset 0 0 18px -6px rgba(37,99,235,.4) !important;
 }
 .risk-table tbody tr.selected {
-  background: rgba(243,152,0,.1) !important;
+  background: rgba(37,99,235,.1) !important;
   box-shadow: inset 3px 0 0 var(--coral) !important;
 }
 .period-btn.active {
-  background: rgba(243,152,0,.1) !important;
+  background: rgba(37,99,235,.1) !important;
   border-color: var(--coral) !important;
   color: var(--coral) !important;
-  box-shadow: 0 0 10px rgba(243,152,0,.35) !important;
+  box-shadow: 0 0 10px rgba(37,99,235,.35) !important;
 }
-.ai-regime { background: rgba(243,152,0,.06) !important; border-color: rgba(243,152,0,.2) !important; }
-.ai-regime strong { text-shadow: 0 0 10px rgba(243,152,0,.45) !important; }
+.ai-regime { background: rgba(37,99,235,.06) !important; border-color: rgba(37,99,235,.2) !important; }
+.ai-regime strong { text-shadow: 0 0 10px rgba(37,99,235,.45) !important; }
 .ai-inline-ask:hover { border-color: var(--coral) !important; color: var(--coral) !important; }
 
 /* 搜索/AI 面板 */
-.search-input-wrap .si-prompt { color: var(--coral) !important; text-shadow: 0 0 8px rgba(243,152,0,.6) !important; }
-.search-item.active { background: var(--coral-soft) !important; border-color: rgba(243,152,0,.35) !important; }
+.search-input-wrap .si-prompt { color: var(--coral) !important; text-shadow: 0 0 8px rgba(37,99,235,.6) !important; }
+.search-item.active { background: var(--coral-soft) !important; border-color: rgba(37,99,235,.35) !important; }
 .search-item.active .si-icon { background: var(--coral) !important; }
-.search-trigger:hover { border-color: var(--coral) !important; box-shadow: 0 0 0 2px rgba(243,152,0,.12) !important; }
+.search-trigger:hover { border-color: var(--coral) !important; box-shadow: 0 0 0 2px rgba(37,99,235,.12) !important; }
 .search-panel::before, .ask-panel::before { border-color: var(--coral-bright) !important; }
-.ask-trigger, .ask-send, .ask-avatar { background: linear-gradient(135deg, #f39800, #e06000) !important; }
+.ask-trigger, .ask-send, .ask-avatar { background: linear-gradient(135deg, #2563eb, #1d4ed8) !important; }
 .ask-msg.user .bubble { background: var(--coral) !important; }
 .ask-chip:hover { border-color: var(--coral) !important; color: var(--coral) !important; background: var(--coral-soft) !important; }
 .ask-typing span { background: var(--coral) !important; }
@@ -2506,8 +2506,8 @@ body::before {
 
 /* 大页脚橙色调 */
 .footer-brand span { color: var(--coral-bright) !important; }
-.footer-top { background: rgba(243,152,0,.08) !important; border-color: rgba(243,152,0,.3) !important; color: var(--coral-bright) !important; }
-.footer-top:hover { background: rgba(243,152,0,.16) !important; }
+.footer-top { background: rgba(37,99,235,.08) !important; border-color: rgba(37,99,235,.3) !important; color: var(--coral-bright) !important; }
+.footer-top:hover { background: rgba(37,99,235,.16) !important; }
 
 /* ── 2. moomoo 行式股票卡片 ── */
 
@@ -2540,12 +2540,12 @@ body::before {
 .stock-block .stock-card::before { display: none !important; }
 .stock-block .stock-card::after  { display: none !important; }
 .stock-block .stock-card:hover {
-  background: rgba(243,152,0,.06) !important;
+  background: rgba(37,99,235,.06) !important;
   box-shadow: inset 2px 0 0 var(--coral-bright) !important;
   transform: none !important;
 }
 .stock-block .stock-card.selected {
-  background: rgba(243,152,0,.09) !important;
+  background: rgba(37,99,235,.09) !important;
   box-shadow: inset 3px 0 0 var(--coral) !important;
 }
 
@@ -2605,21 +2605,21 @@ body::before {
 .stock-block .card-footer { display: none !important; }
 
 /* ── 4. mp 组合体检区块同步橙色调 ── */
-.mp-empty { border-color: rgba(243,152,0,.22) !important; }
+.mp-empty { border-color: rgba(37,99,235,.22) !important; }
 .mp-empty-glow {
-  background: radial-gradient(50% 60% at 50% 0%, rgba(243,152,0,.18), transparent 70%),
+  background: radial-gradient(50% 60% at 50% 0%, rgba(37,99,235,.18), transparent 70%),
               radial-gradient(40% 50% at 70% 10%, rgba(249,115,22,.14), transparent 70%) !important;
 }
 .mp-empty-eyebrow { color: var(--coral-bright) !important; }
 .mp-cta-btn {
-  background: linear-gradient(135deg, #f39800, #e06000) !important;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
   color: #000 !important;
-  box-shadow: 0 10px 32px rgba(243,152,0,.34) !important;
+  box-shadow: 0 10px 32px rgba(37,99,235,.34) !important;
 }
-.mp-cta-btn:hover { box-shadow: 0 16px 42px rgba(243,152,0,.5) !important; }
+.mp-cta-btn:hover { box-shadow: 0 16px 42px rgba(37,99,235,.5) !important; }
 
 /* Trump tab 橙色 active */
-.trump-tab.active { background: linear-gradient(135deg, #f39800, #e06000) !important; color: #000 !important; }
+.trump-tab.active { background: linear-gradient(135deg, #2563eb, #1d4ed8) !important; color: #000 !important; }
 
 /* ════════════════════════════════════════════════════════════
    密集化层 — 收紧间距，提升信息密度（moomoo 风格的紧凑感）
@@ -2714,17 +2714,17 @@ body {
 .mp-advice-cta,
 .mp-scen-tab.active,
 .pf-btn.primary {
-  background: linear-gradient(135deg, #f39800, #d46000) !important;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
   color: #000 !important;
   border-color: transparent !important;
-  box-shadow: 0 6px 20px rgba(243,152,0,.3) !important;
+  box-shadow: 0 6px 20px rgba(37,99,235,.3) !important;
 }
-.mp-advice-cta:hover { box-shadow: 0 10px 28px rgba(243,152,0,.48) !important; }
+.mp-advice-cta:hover { box-shadow: 0 10px 28px rgba(37,99,235,.48) !important; }
 .pf-btn.primary:not(:disabled):hover { filter: brightness(1.1) !important; }
 
 /* 因子与集中度填充条 → 橙色 */
-.mp-factor-fill { background: linear-gradient(90deg, #f39800, #d46000) !important; }
-.mp-conc-fill   { background: linear-gradient(90deg, rgba(243,152,0,.5), rgba(212,96,0,.4)) !important; }
+.mp-factor-fill { background: linear-gradient(90deg, #2563eb, #1d4ed8) !important; }
+.mp-conc-fill   { background: linear-gradient(90deg, rgba(37,99,235,.5), rgba(29,78,216,.4)) !important; }
 
 /* ── 残留海军蓝背景 → 纯黑 ── */
 .pf-overlay { background: rgba(0,0,0,.88) !important; }
@@ -2733,10 +2733,10 @@ body {
 .pf-row     { background: #111 !important; border-color: #1c1c1c !important; }
 .pf-add {
   color: var(--coral-bright) !important;
-  background: rgba(243,152,0,.1) !important;
-  border: 1px solid rgba(243,152,0,.32) !important;
+  background: rgba(37,99,235,.1) !important;
+  border: 1px solid rgba(37,99,235,.32) !important;
 }
-.pf-add:hover { background: rgba(243,152,0,.18) !important; }
+.pf-add:hover { background: rgba(37,99,235,.18) !important; }
 
 .mp-scen-tab:not(.active) {
   background: #111 !important;
@@ -2765,8 +2765,8 @@ body {
 .trump-tab:not(.active) { background: #111 !important; border-color: #1c1c1c !important; }
 .mp-tag-hedge {
   color: var(--coral-bright) !important;
-  background: rgba(243,152,0,.1) !important;
-  border-color: rgba(243,152,0,.28) !important;
+  background: rgba(37,99,235,.1) !important;
+  border-color: rgba(37,99,235,.28) !important;
 }
 
 /* ── 区块标题：从 AI 营销大标题 → 终端模块标题栏 ── */
@@ -2788,9 +2788,9 @@ body {
   font-size: 10px !important;
   font-weight: 700 !important;
   padding: 1px 6px !important;
-  background: rgba(243,152,0,.08) !important;
+  background: rgba(37,99,235,.08) !important;
   color: var(--coral-bright) !important;
-  border: 1px solid rgba(243,152,0,.25) !important;
+  border: 1px solid rgba(37,99,235,.25) !important;
   border-radius: 3px !important;
   box-shadow: none !important;
 }
@@ -2811,7 +2811,7 @@ body {
   right: 0; bottom: -1px;
   width: 55%;
   height: 1px;
-  background: linear-gradient(90deg, rgba(243,152,0,.35), transparent);
+  background: linear-gradient(90deg, rgba(37,99,235,.35), transparent);
   pointer-events: none;
 }
 
@@ -2848,11 +2848,11 @@ body {
 /* ── 1. 修正 CSS 变量：将所有残余 cyan/purple 替换为橙色系 ── */
 body {
   /* brand accent → orange */
-  --coral:        #f39800 !important;
-  --coral-bright: #f39800 !important;
-  --coral-deep:   #d46000 !important;
-  --coral-soft:   rgba(243,152,0,.12) !important;
-  --coral-grad:   linear-gradient(135deg, #f39800 0%, #d46000 100%) !important;
+  --coral:        #2563eb !important;
+  --coral-bright: #2563eb !important;
+  --coral-deep:   #1d4ed8 !important;
+  --coral-soft:   rgba(37,99,235,.12) !important;
+  --coral-grad:   linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
   /* TypeUI Dashboard 语义色彩 */
   --success:      #10b981;
   --success-soft: rgba(16,185,129,.12);
@@ -2861,9 +2861,9 @@ body {
   --danger:       #ef4444;
   --danger-soft:  rgba(239,68,68,.12);
   /* ai-purple 渐变第二色也切换到深橙 */
-  --ai-purple:    #d46000 !important;
-  --ai-purple-soft: rgba(212,96,0,.1) !important;
-  --ai-purple-grad: linear-gradient(135deg, #f39800, #d46000) !important;
+  --ai-purple:    #1d4ed8 !important;
+  --ai-purple-soft: rgba(29,78,216,.1) !important;
+  --ai-purple-grad: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
   /* IBM Plex 字型作首选 (fallback 到已有自托管字体) */
   --font-mono: 'IBM Plex Mono', 'JetBrains Mono', 'Space Mono', ui-monospace, Consolas, monospace !important;
   --font-sans: 'IBM Plex Sans', 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
@@ -2901,56 +2901,56 @@ body {
 
 /* ── 4. 橙色一致性：hover/active 状态统一为橙色辉光 ── */
 .stock-card:hover {
-  background: rgba(243,152,0,.04) !important;
-  box-shadow: inset 0 0 0 1px rgba(243,152,0,.18), inset 2px 0 0 #f39800, 0 0 20px -4px rgba(243,152,0,.3) !important;
+  background: rgba(37,99,235,.04) !important;
+  box-shadow: inset 0 0 0 1px rgba(37,99,235,.18), inset 2px 0 0 #2563eb, 0 0 20px -4px rgba(37,99,235,.3) !important;
 }
 .risk-table tbody tr:hover {
-  background: rgba(243,152,0,.06) !important;
-  box-shadow: inset 2px 0 0 #f39800 !important;
+  background: rgba(37,99,235,.06) !important;
+  box-shadow: inset 2px 0 0 #2563eb !important;
 }
 .stat-card.clickable:hover, .struct-card:hover {
-  border-color: rgba(243,152,0,.3) !important;
-  box-shadow: 0 0 0 1px rgba(243,152,0,.12), 0 8px 24px rgba(0,0,0,.5) !important;
+  border-color: rgba(37,99,235,.3) !important;
+  box-shadow: 0 0 0 1px rgba(37,99,235,.12), 0 8px 24px rgba(0,0,0,.5) !important;
 }
-.nav-link:hover     { background: rgba(243,152,0,.07) !important; }
-.nav-link.active    { color: #f39800 !important; }
+.nav-link:hover     { background: rgba(37,99,235,.07) !important; }
+.nav-link.active    { color: #2563eb !important; }
 .nav-link.active::after {
-  background: #f39800 !important;
-  box-shadow: 0 0 8px rgba(243,152,0,.5) !important;
+  background: #2563eb !important;
+  box-shadow: 0 0 8px rgba(37,99,235,.5) !important;
 }
 .tm-ticker:hover:not(:disabled) {
-  border-color: rgba(243,152,0,.4) !important;
-  background: rgba(243,152,0,.05) !important;
+  border-color: rgba(37,99,235,.4) !important;
+  background: rgba(37,99,235,.05) !important;
 }
 
 /* ── 5. nav 进度条：橙色渐变 ── */
 .nav-progress {
-  background: linear-gradient(90deg, #f39800, #d46000) !important;
-  box-shadow: 0 0 10px rgba(243,152,0,.45) !important;
+  background: linear-gradient(90deg, #2563eb, #1d4ed8) !important;
+  box-shadow: 0 0 10px rgba(37,99,235,.45) !important;
 }
 
 /* ── 6. nav logo：移除 cyan/purple 渐变 → 橙色系 ── */
 .nav-logo {
-  background: linear-gradient(135deg, rgba(243,152,0,.18), rgba(212,96,0,.12)) !important;
-  border-color: rgba(243,152,0,.28) !important;
-  color: #f39800 !important;
+  background: linear-gradient(135deg, rgba(37,99,235,.18), rgba(29,78,216,.12)) !important;
+  border-color: rgba(37,99,235,.28) !important;
+  color: #2563eb !important;
 }
 
 /* ── 7. HUD 角标和装饰线：cyan → 橙 ── */
 .risk-table-wrap::before, .stock-grid::before, .lev-card::before {
-  border-color: rgba(243,152,0,.5) !important;
-  filter: drop-shadow(0 0 3px rgba(243,152,0,.4)) !important;
+  border-color: rgba(37,99,235,.5) !important;
+  filter: drop-shadow(0 0 3px rgba(37,99,235,.4)) !important;
 }
 .risk-table-wrap::after, .stock-grid::after, .lev-card::after {
-  border-color: rgba(243,152,0,.5) !important;
-  filter: drop-shadow(0 0 3px rgba(243,152,0,.4)) !important;
+  border-color: rgba(37,99,235,.5) !important;
+  filter: drop-shadow(0 0 3px rgba(37,99,235,.4)) !important;
 }
 .section-title::after {
-  background: linear-gradient(90deg, transparent, rgba(243,152,0,.5), transparent) !important;
+  background: linear-gradient(90deg, transparent, rgba(37,99,235,.5), transparent) !important;
 }
 
 /* ── 8. 恐慌分数辉光：橙色 ── */
-.panic-score-val { text-shadow: 0 0 20px rgba(243,152,0,.55) !important; }
+.panic-score-val { text-shadow: 0 0 20px rgba(37,99,235,.55) !important; }
 
 /* ── 9. TypeUI 市场信号色彩（精准对齐 TypeUI dashboard 语义色）── */
 /* green up: TypeUI #10b981, 当前 #10d97a — 改为更专业的绿色 */
@@ -2962,18 +2962,18 @@ body {
 
 /* ── 10. 键盘焦点环：橙色（可访问性，WCAG AA）── */
 *:focus-visible {
-  outline: 2px solid rgba(243,152,0,.65) !important;
+  outline: 2px solid rgba(37,99,235,.65) !important;
   outline-offset: 2px !important;
 }
 
 /* ── 11. 剪掉 hero 区块的 cyan 残留 ── */
-.hero-eyebrow { color: #f39800 !important; text-shadow: 0 0 12px rgba(243,152,0,.35) !important; }
-.hero-sub-em  { color: #f39800 !important; }
-.hero-btn.ghost:hover { border-color: rgba(243,152,0,.4) !important; color: #f39800 !important; box-shadow: 0 0 0 3px rgba(243,152,0,.1) !important; }
+.hero-eyebrow { color: #2563eb !important; text-shadow: 0 0 12px rgba(37,99,235,.35) !important; }
+.hero-sub-em  { color: #2563eb !important; }
+.hero-btn.ghost:hover { border-color: rgba(37,99,235,.4) !important; color: #2563eb !important; box-shadow: 0 0 0 3px rgba(37,99,235,.1) !important; }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    Layer 9 — TypeUI 深蓝主色调覆盖
-   替换全站橙色 #f39800 → TypeUI 主蓝 #2563eb
+   替换全站橙色 #2563eb → TypeUI 主蓝 #2563eb
    替换 cyan/紫色渐变 → 蓝色系
    ═══════════════════════════════════════════════════════════════════════════ */
 
