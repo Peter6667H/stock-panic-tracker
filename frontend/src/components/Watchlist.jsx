@@ -43,7 +43,44 @@ function Row({ sym, q, selected, onSelect, onContext }) {
   )
 }
 
-export default function Watchlist({ quotes, selectedSym, onSelect, onContext }) {
+function StripCard({ sym, q, selected, onSelect }) {
+  const up = (q?.pct ?? 0) >= 0
+  const sgn = up ? '+' : ''
+  const code = sym.replace('^', '')
+  return (
+    <button
+      className={`wl-sc${selected ? ' selected' : ''}${up ? ' up' : ' dn'}`}
+      onClick={() => onSelect(sym)}
+    >
+      <span className="wl-sc-code">{code}</span>
+      <span className={`wl-sc-price ${up ? 'positive' : 'negative'}`}>
+        {q ? (q.price > 100 ? q.price.toFixed(0) : q.price.toFixed(2)) : '--'}
+      </span>
+      <span className={`wl-sc-badge ${up ? 'wl-up' : 'wl-dn'}`}>
+        {q ? `${sgn}${q.pct?.toFixed(2)}%` : '--'}
+      </span>
+    </button>
+  )
+}
+
+const ALL_SYMS = GROUPS.flatMap(g => SYMBOLS[g.key])
+
+export default function Watchlist({ quotes, selectedSym, onSelect, onContext, mode }) {
+  if (mode === 'strip') {
+    return (
+      <div className="wl-strip">
+        {GROUPS.map(g => (
+          <div key={g.key} className="wl-strip-group">
+            <span className="wl-strip-label">{g.label.split(' · ')[0]}</span>
+            {SYMBOLS[g.key].map(sym => (
+              <StripCard key={sym} sym={sym} q={quotes[sym]} selected={selectedSym === sym} onSelect={onSelect} />
+            ))}
+          </div>
+        ))}
+      </div>
+    )
+  }
+
   return (
     <div className="watchlist">
       <div className="wl-header">
