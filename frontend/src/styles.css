@@ -2839,3 +2839,135 @@ body {
 /* 大页脚：收紧 */
 .footer-inner { padding: 44px 28px 52px !important; }
 
+/* ════════════════════════════════════════════════════════════
+   Layer 8 — TypeUI Dashboard × impeccable polish
+   橙色统一 · 玻璃面板 · IBM Plex 字型 · 语义色彩 · 运动规范
+   参考: typeui.sh/design-systems/dashboard (dark, surface #09090b)
+   ════════════════════════════════════════════════════════════ */
+
+/* ── 1. 修正 CSS 变量：将所有残余 cyan/purple 替换为橙色系 ── */
+body {
+  /* brand accent → orange */
+  --coral:        #f39800 !important;
+  --coral-bright: #f39800 !important;
+  --coral-deep:   #d46000 !important;
+  --coral-soft:   rgba(243,152,0,.12) !important;
+  --coral-grad:   linear-gradient(135deg, #f39800 0%, #d46000 100%) !important;
+  /* TypeUI Dashboard 语义色彩 */
+  --success:      #10b981;
+  --success-soft: rgba(16,185,129,.12);
+  --warning:      #f59e0b;
+  --warning-soft: rgba(245,158,11,.12);
+  --danger:       #ef4444;
+  --danger-soft:  rgba(239,68,68,.12);
+  /* ai-purple 渐变第二色也切换到深橙 */
+  --ai-purple:    #d46000 !important;
+  --ai-purple-soft: rgba(212,96,0,.1) !important;
+  --ai-purple-grad: linear-gradient(135deg, #f39800, #d46000) !important;
+  /* IBM Plex 字型作首选 (fallback 到已有自托管字体) */
+  --font-mono: 'IBM Plex Mono', 'JetBrains Mono', 'Space Mono', ui-monospace, Consolas, monospace !important;
+  --font-sans: 'IBM Plex Sans', 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+  /* TypeUI Dashboard 阴影 (glass elevation) */
+  --shadow-sm:  0 1px 3px rgba(0,0,0,.5), 0 4px 12px rgba(0,0,0,.3) !important;
+  --shadow:     0 1px 3px rgba(0,0,0,.5), 0 8px 24px rgba(0,0,0,.4) !important;
+  --shadow-lg:  0 2px 6px rgba(0,0,0,.6), 0 16px 48px rgba(0,0,0,.5) !important;
+}
+
+/* ── 2. TypeUI Dashboard 玻璃面板治理：三栏面板 + stat-card + struct-card ── */
+.tm-left, .tm-center, .tm-right {
+  background: linear-gradient(180deg, rgba(18,18,18,.98), rgba(10,10,10,.98)) !important;
+  border: 1px solid rgba(255,255,255,.055) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,.5), 0 8px 24px rgba(0,0,0,.4) !important;
+}
+.tm-strip {
+  background: linear-gradient(180deg, rgba(14,14,14,.98), rgba(8,8,8,.98)) !important;
+  border: 1px solid rgba(255,255,255,.05) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,.4) !important;
+}
+.stat-card, .struct-card {
+  background: rgba(14,14,14,.95) !important;
+  border: 1px solid rgba(255,255,255,.055) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,.5), 0 8px 24px rgba(0,0,0,.35) !important;
+}
+
+/* ── 3. TypeUI 运动规范：150-250ms，state-driven ── */
+.tm-ticker            { transition: border-color .15s, background .15s !important; }
+.wl-row               { transition: background .15s, border-left-color .15s !important; }
+.nav-link             { transition: color .15s, background .15s !important; }
+.nav-icon-btn         { transition: border-color .15s, color .15s, box-shadow .15s !important; }
+.stat-card.clickable  { transition: border-color .2s, box-shadow .2s !important; }
+.pf-btn               { transition: background .15s, opacity .15s !important; }
+.td-ai-btn            { transition: box-shadow .2s, filter .15s !important; }
+
+/* ── 4. 橙色一致性：hover/active 状态统一为橙色辉光 ── */
+.stock-card:hover {
+  background: rgba(243,152,0,.04) !important;
+  box-shadow: inset 0 0 0 1px rgba(243,152,0,.18), inset 2px 0 0 #f39800, 0 0 20px -4px rgba(243,152,0,.3) !important;
+}
+.risk-table tbody tr:hover {
+  background: rgba(243,152,0,.06) !important;
+  box-shadow: inset 2px 0 0 #f39800 !important;
+}
+.stat-card.clickable:hover, .struct-card:hover {
+  border-color: rgba(243,152,0,.3) !important;
+  box-shadow: 0 0 0 1px rgba(243,152,0,.12), 0 8px 24px rgba(0,0,0,.5) !important;
+}
+.nav-link:hover     { background: rgba(243,152,0,.07) !important; }
+.nav-link.active    { color: #f39800 !important; }
+.nav-link.active::after {
+  background: #f39800 !important;
+  box-shadow: 0 0 8px rgba(243,152,0,.5) !important;
+}
+.tm-ticker:hover:not(:disabled) {
+  border-color: rgba(243,152,0,.4) !important;
+  background: rgba(243,152,0,.05) !important;
+}
+
+/* ── 5. nav 进度条：橙色渐变 ── */
+.nav-progress {
+  background: linear-gradient(90deg, #f39800, #d46000) !important;
+  box-shadow: 0 0 10px rgba(243,152,0,.45) !important;
+}
+
+/* ── 6. nav logo：移除 cyan/purple 渐变 → 橙色系 ── */
+.nav-logo {
+  background: linear-gradient(135deg, rgba(243,152,0,.18), rgba(212,96,0,.12)) !important;
+  border-color: rgba(243,152,0,.28) !important;
+  color: #f39800 !important;
+}
+
+/* ── 7. HUD 角标和装饰线：cyan → 橙 ── */
+.risk-table-wrap::before, .stock-grid::before, .lev-card::before {
+  border-color: rgba(243,152,0,.5) !important;
+  filter: drop-shadow(0 0 3px rgba(243,152,0,.4)) !important;
+}
+.risk-table-wrap::after, .stock-grid::after, .lev-card::after {
+  border-color: rgba(243,152,0,.5) !important;
+  filter: drop-shadow(0 0 3px rgba(243,152,0,.4)) !important;
+}
+.section-title::after {
+  background: linear-gradient(90deg, transparent, rgba(243,152,0,.5), transparent) !important;
+}
+
+/* ── 8. 恐慌分数辉光：橙色 ── */
+.panic-score-val { text-shadow: 0 0 20px rgba(243,152,0,.55) !important; }
+
+/* ── 9. TypeUI 市场信号色彩（精准对齐 TypeUI dashboard 语义色）── */
+/* green up: TypeUI #10b981, 当前 #10d97a — 改为更专业的绿色 */
+:root { --green: #10b981 !important; --green-soft: rgba(16,185,129,.14) !important; }
+/* red down: TypeUI #ef4444, 当前 #ff4d5a — 改为更标准的红色 */
+:root { --red: #ef4444 !important; --red-soft: rgba(239,68,68,.14) !important; }
+/* amber: TypeUI #f59e0b — 与当前 #f5c84b 拉开对比度 */
+:root { --amber: #f59e0b !important; }
+
+/* ── 10. 键盘焦点环：橙色（可访问性，WCAG AA）── */
+*:focus-visible {
+  outline: 2px solid rgba(243,152,0,.65) !important;
+  outline-offset: 2px !important;
+}
+
+/* ── 11. 剪掉 hero 区块的 cyan 残留 ── */
+.hero-eyebrow { color: #f39800 !important; text-shadow: 0 0 12px rgba(243,152,0,.35) !important; }
+.hero-sub-em  { color: #f39800 !important; }
+.hero-btn.ghost:hover { border-color: rgba(243,152,0,.4) !important; color: #f39800 !important; box-shadow: 0 0 0 3px rgba(243,152,0,.1) !important; }
+
